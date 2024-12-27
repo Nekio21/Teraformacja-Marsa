@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Teraformacja Marsa</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300..700&display=swap" rel="stylesheet">
+	
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chat" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=diversity_3" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=send" />
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="../css/game.css">
+</head>
+<body>
+    <header class="topbar">
+        <header>
+            Adrian
+        </header>
+        <section>
+            <section>
+                <img src="../assets/gold.png" alt="gold icon" width="30px" height="30px"/>
+                <span>127 [+17]</span>
+            </section>
+            <section>
+                <img src="../assets/metal.png" alt="metal icon" width="30px" height="30px"/>
+                <span>13 [+3 :2]</span>
+            </section>
+            <section>
+                <img src="../assets/titanium.png" alt="titanium icon" width="30px" height="30px"/>
+                <span>13 [+3 :3]</span>
+            </section>
+
+            <section>
+                <img src="../assets/plants.png" alt="plants icon" width="30px" height="30px"/>
+                <span>13 [+3 /3]</span>
+            </section>
+            <section>
+                <img src="../assets/energy.png" alt="energy icon" width="30px" height="30px"/>
+                <span>13 [+3]</span>
+            </section>
+            <section class="lastResource">
+                <img src="../assets/heat.png" alt="heat icon" width="30px" height="30px"/>
+                <span>13 [+3 /8]</span>
+            </section>
+        
+			<div class="endRound">Zakończ runde</div>
+		</section>
+    </header>
+
+    <main class="mainPart">
+        <nav class="leftPart">
+            <section class="gameStat">
+                <header>Warunki końca gry</header>
+				
+				<section class="stat tempStat">
+
+                    <section>
+						<span>Temp. 12&#176;</span>
+					
+                        <span class="material-symbols-outlined">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined tempNot">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined tempNot">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined tempNot">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined tempNot">
+                     device_thermostat
+                        </span>
+						<span class="material-symbols-outlined tempNot">
+                     device_thermostat
+                        </span>
+                      
+                    </section>
+
+                    
+                </section>
+                <section class="stat oxygenStat">
+                    <section>
+					<span>Tlen 4</span>
+                        <span class="material-symbols-outlined">
+                            spo2
+                        </span>
+                    <span class="material-symbols-outlined">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined ">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined oxygenStatNot">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined oxygenStatNot" >
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined oxygenStatNot">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined oxygenStatNot">
+                            spo2
+                        </span>
+						<span class="material-symbols-outlined oxygenStatNot">
+                            spo2
+                        </span>
+                    </section>
+
+                
+                </section>
+                <section class="stat waterStat">
+                    <section>
+					<span>Oceania 4</span>
+                        <span class="material-symbols-outlined">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined waterStatNot">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined waterStatNot">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined waterStatNot">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined waterStatNot">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined waterStatNot">
+                            waves
+                        </span>
+						<span class="material-symbols-outlined waterStatNot">
+                            waves
+                        </span>
+                    </section>
+                </section>
+            </section>
+            
+            <section class="shop">
+                <section class="infoLeft">
+                    <header>Tytuły</header>
+                    <section>
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                    </section>
+                </section>
+
+                <section class="infoLeft">
+                    <header>Nagrody</header>
+                    <section>
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                    </section>
+                </section>
+
+                <section class="infoLeft">
+                    <header>Projekty Standartowe</header>
+                    <section>
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                        <img src="../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
+                    </section>
+                </section>
+            </section>
+
+ 
+        </nav>
+
+        <main class="midPart">
+            <section class="board">
+                <section class="row">
+                    <div>
+                        <div>
+                            <img src="../assets/metal.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/metal.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <div>
+                        <div>
+                            <img src="../assets/metal.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/metal.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                   <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                   <div>
+                        <div>
+                            <img src="../assets/card.svg" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+                </section>
+
+                <section class="row">
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <div>
+                            <img src="../assets/metal.png" alt="metal icon" width="20px" height="20px"/>
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rectPawnBrown.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <div>
+                            <img src="../assets/card.svg" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/card.svg" alt="plants card" width="20px" height="20px"/> 
+
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    
+                </section>
+
+                <section class="row">
+                    <div>
+                        <div>
+                            <img src="../assets/card.svg" alt="plants card" width="20px" height="20px"/> 
+ 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <img src="../assets/rectPawnPink.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rectPawnBlue.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rectPawnGreen.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rectPawnRed.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <div>
+                            <img src="../assets/metal.png" alt="metal card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                </section>
+
+                <section class="row">
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                   
+                    
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    
+                </section>
+
+                <section class="row">
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+                     
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+                    
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div> 
+                </section>
+
+                <section class="row">
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+    
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+
+                    
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
+                        </div>
+                        <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/>
+                    </div>
+                </section>
+
+                
+
+                <section class="row">
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <div>
+                            <img src="../assets/plants.png" alt="plants card" width="20px" height="20px"/>  
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                </section>
+
+                <section class="row">
+                    <div>
+                        <div>
+                            <img src="../assets/metal.png" alt="metal icon" width="20px" height="20px"/>
+                            <img src="../assets/metal.png" alt="metal icon" width="20px" height="20px"/>
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    <div>
+                        <div>
+                            <img src="../assets/card.svg" alt="card icon" width="20px" height="20px"/>
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div> 
+
+                    <div>
+                        <div>
+                            <img src="../assets/card.svg" alt="card icon" width="20px" height="20px"/>
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div> 
+                    
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <div>
+                            <img src="../assets/titanium.png" alt="titanium icon" width="20px" height="20px"/>
+
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    
+                </section>
+
+                <section class="row">
+                    <div>
+                        <div>
+                            <img src="../assets/metal.png" alt="metal icon" width="20px" height="20px"/>
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+
+                    <div>
+                        <div>
+                            <img src="../assets/metal.png" alt="metal icon" width="20px" height="20px"/>
+                            <img src="../assets/metal.png" alt="metal icon" width="20px" height="20px"/>
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+                    
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <img src="../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+
+                    <div>
+                        <div>
+                            <img src="../assets/titanium.png" alt="titanium icon" width="20px" height="20px"/>
+                            <img src="../assets/titanium.png" alt="titanium icon" width="20px" height="20px"/>
+                        </div>
+                        <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
+
+                </section>
+
+                <section class="childPlanet">
+                    <img src="../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                </section>
+            </section>
+
+             <section class="pasek">
+                <div class="dotsline">
+                    <div class="checked">
+                        <span>20</span>
+                    </div>
+                    <div class="greenPawn"></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked greenPawn">
+                        
+                    </div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked">
+                        <span>30</span>
+                    </div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked">
+
+                    </div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked">
+                        <span>40</span>
+                    </div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked"></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked">
+                        <span>50</span>
+                    </div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked"></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="checked">
+                        <span>60</span>
+                    </div>
+                   
+                </div>
+            </section> 
+        </main>
+
+        <nav class="rightPart">
+            <section class="playersTab">
+				<div class="infoGamerPoligon infoGamerBorder infoGamerBorderBlue">
+					<div class="infoGamerPoligon infoGamerInside infoGamerInsideBlue">
+						<div class="playerName">Jakub</div>
+						<div class="infoPlayerContainer">
+						
+                            <section>
+                                <img src="../assets/gold.png" alt="gold icon" width="25px" height="25px"/>
+                                <span>127 [+17]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/metal.png" alt="metal icon" width="25px" height="25px"/>
+                                <span>13 [+3 :2]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/titanium.png" alt="titanium icon" width="25px" height="25px"/>
+                                <span>13 [+3 :3]</span>
+                            </section>
+
+                            <section>
+                                <img src="../assets/plants.png" alt="plants icon" width="25px" height="25px"/>
+                                <span>13 [+3 /3]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/energy.png" alt="energy icon" width="25px" height="25px"/>
+                                <span>13 [+3]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/heat.png" alt="heat icon" width="25px" height="25px"/>
+                                <span>13 [+3 /8]</span>
+                            </section>
+        
+						
+						</div>
+					</div>
+				
+                    
+                </div>
+				
+				<div class="infoGamerPoligon infoGamerBorder infoGamerBorderPurple">
+					<div class="infoGamerPoligon infoGamerInside infoGamerInsidePurple">
+						<div class="playerName">Agata</div>
+						<div class="infoPlayerContainer">
+						
+                            <section>
+                                <img src="../assets/gold.png" alt="gold icon" width="25px" height="25px"/>
+                                <span>127 [+17]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/metal.png" alt="metal icon" width="25px" height="25px"/>
+                                <span>13 [+3 :2]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/titanium.png" alt="titanium icon" width="25px" height="25px"/>
+                                <span>13 [+3 :3]</span>
+                            </section>
+
+                            <section>
+                                <img src="../assets/plants.png" alt="plants icon" width="25px" height="25px"/>
+                                <span>13 [+3 /3]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/energy.png" alt="energy icon" width="25px" height="25px"/>
+                                <span>13 [+3]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/heat.png" alt="heat icon" width="25px" height="25px"/>
+                                <span>13 [+3 /8]</span>
+                            </section>
+        
+						
+						</div>
+					</div>
+				</div>
+				
+				<div class="infoGamerPoligon infoGamerBorder infoGamerBorderRed">
+					<div class="infoGamerPoligon infoGamerInside infoGamerInsideRed">
+						<div class="playerName">Adam</div>
+						<div class="infoPlayerContainer">
+						
+                            <section>
+                                <img src="../assets/gold.png" alt="gold icon" width="25px" height="25px"/>
+                                <span>127 [+17]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/metal.png" alt="metal icon" width="25px" height="25px"/>
+                                <span>13 [+3 :2]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/titanium.png" alt="titanium icon" width="25px" height="25px"/>
+                                <span>13 [+3 :3]</span>
+                            </section>
+
+                            <section>
+                                <img src="../assets/plants.png" alt="plants icon" width="25px" height="25px"/>
+                                <span>13 [+3 /3]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/energy.png" alt="energy icon" width="25px" height="25px"/>
+                                <span>13 [+3]</span>
+                            </section>
+                            <section>
+                                <img src="../assets/heat.png" alt="heat icon" width="25px" height="25px"/>
+                                <span>13 [+3 /8]</span>
+                            </section>
+        
+						
+						</div>
+					</div>
+				</div>
+            </section>
+            
+            <section class="playersMessage">
+                <section class="messages">
+                    <section class="message">
+                        nterdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam a ex et turpis iaculis semper. 
+                    </section>
+                    <section class="messageYourself">
+                        Donec ac tellus sed felis placerat tincidunt et interdum lacus. Praesent sapien ligula, consequat eget efficitur sit amet, semper eu magna. 
+                    </section>
+                 
+                    <section class="messageYourself">
+                        Witaj jak tam ???
+                    </section>
+                    <section class="message">
+                        Witaj jak tam ???
+                    </section>
+
+                    <section class="message">
+                        Witaj jak tam ???
+                    </section>
+                    <section class="message">
+                        Witaj jak tam ???
+                    </section>
+                    
+                </section>
+                <div class="inputMessage">
+                    <div class="inputMessageInside">
+                        <input type="text"/>
+                        <span class="material-symbols-outlined">
+                            send
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="sectionButtons"> 
+               <div class="poligonBorder poligonBorderWhite">
+				   <div class="poligonBackground poligonBackgroundWhite">
+					   <span class="material-symbols-outlined">
+						diversity_3
+						</span>
+						<span>Gracze</span>
+					</div>
+				</div>
+               <div class="poligonBorder poligonBorderBlue">
+				   <div class="poligonBackground poligonBackgroundBlue">
+					   <span class="material-symbols-outlined">
+						chat
+						</span>
+						<span>Chat</span>
+				   </div>
+			   </div>
+            </section>
+        </nav>
+    </main>
+</body>
+</html>

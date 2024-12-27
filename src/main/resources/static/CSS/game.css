@@ -1,0 +1,607 @@
+*{
+	box-sizing: border-box;
+    margin: 0px;
+}
+
+html{
+    height: 100%;
+    cursor: url("../assets/cursor.svg") 1 1,auto;
+}
+
+
+body{
+    height: 100%;
+    
+    font-family: "Jura", sans-serif;
+    font-optical-sizing: auto;
+    
+    background-color:#100803;
+    color: #FBFEFB;
+
+}
+
+::-webkit-scrollbar {
+    width:0px;
+}
+
+.mainPart{
+    display: flex;
+    
+    height: calc(100% - 80px);
+    padding-right: 40px;
+	padding-left: 40px;
+	padding-top: 20px;
+}
+
+.mainPart > *{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.leftPart{
+	justify-content: flex-start !important;
+	gap: 25px;
+}
+
+.topbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    padding: 10px 40px;
+   
+    background-color: #100803;
+
+    box-shadow: 0px 3px 10px #00DCFF;
+}
+
+.topbar > header{
+    font-weight: 500;
+    font-size: 24px;
+
+    color: #00DCFF;
+}
+
+.topbar > section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.topbar > section > section{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.gameStat{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dotsline{
+    width: 90%;
+    height:1px;
+    margin: auto auto;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+
+}
+
+.dotsline > div{
+    width: 3px;
+    height: 3px;
+    
+    position: relative;
+    top: -4px;
+
+    border-radius: 50%;
+    
+    border-width: 4px;
+    border-style: solid;
+}
+
+
+
+.checked {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    width: 4px !important;
+    height: 4px !important;
+
+    top: -12px !important;
+}
+
+
+.checked > span {
+    position: relative;
+    top:-20px;
+
+    font-size: 24px;
+}
+
+.stat {
+
+}
+
+.stat > section{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: auto auto;
+	
+    margin-bottom: 10px;
+
+    font-weight: 400;
+    font-size: 16px !important;
+}
+
+.tempStat{
+    color: #FF0000;
+}
+
+.tempNot{
+	color: #FF000055 !important;
+}
+
+.tempStat > .dotsline, .tempStat > .dotsline > div{
+    background-color: #721817;
+    border-color: #721817;
+}
+
+.tempStat .checked{
+    background-color: #FF8A5B !important;
+}
+
+
+.oxygenStat{
+    color: #FF8A00;
+}
+
+.oxygenStatNot{
+    color: #FF8A0055;
+}
+
+.oxygenStat > .dotsline, .oxygenStat > .dotsline > div{
+    background-color: #15616D;
+    border-color: #15616D;
+}
+
+.oxygenStat .checked{
+    background-color: #B0C1FF !important;
+}
+
+
+.waterStat{
+    color: #00DCFF;   
+}
+
+.waterStatNot{
+    color: #00DCFF55 !important;   
+}
+
+.material-symbols-outlined{
+    font-size: 16px;
+}
+
+.shop{
+    
+}
+
+.infoLeft{
+	margin-bottom: 5px;
+}
+
+.infoLeft > header, .gameStat > header{
+    font-size: 32px;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+.infoLeft > section{
+    display: flex;
+    gap: 7px;
+}
+
+.players{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.players > section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 136px;
+    width: 118px;
+}
+
+.players > section > img {
+    position: absolute;
+    scale: 0.8;
+    z-index: -1;
+}
+
+.midPart{
+   height:100%;
+   width:58%;
+   justify-content: flex-start;
+   gap:40px;
+}
+
+.board{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+}
+
+
+/* moze zrobic animacje jak sie to przesuwa to robi ciekawa wyglad :D */
+.board > section{
+    margin-bottom: -18px;
+}
+
+.pasek{
+	display: flex;
+	justify-content: center;
+    position: relative;
+
+    width:100%;
+    height: 50px;
+}
+
+.pasek > .dotsline{
+    width: 78%;
+    position: absolute;
+    bottom: 12px;
+	
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.pasek > .dotsline, .pasek > .dotsline > div{
+    background-color: #FBFEFB;
+    border-color: #FBFEFB;
+}
+
+.greenPawn{
+    background-color: #15616D !important;
+    border-color: #15616D !important;
+}
+
+.childPlanet{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    right: 100px;
+    top: 30px;
+ 
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+    box-shadow: 0px 0px 40px #fefefe;
+
+    background-color: #100803;
+}
+
+.endGame{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    right: 90px;
+    bottom: 30px;
+
+    text-align: center;
+
+    width: 116px;
+    height: 133px;
+
+    cursor:pointer;
+}
+
+.lastResource{
+	padding-right: 20px;
+	border-right: 2px dotted #fff;
+}
+
+.endRound:hover{
+	
+}
+
+.endGame > header{
+    position: absolute;
+}
+
+.row > div{
+    display: inline-block;
+    position: relative;
+}
+
+.row > div > div {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 5px;
+
+    position: absolute;
+}
+
+.row > div > div > img{
+    box-shadow: 0px 0px 10px #001524;
+}
+
+.row > div > div :first-child {
+    margin-top: 10px;
+}
+
+.row > div > div :last-child{
+    margin-bottom: 10px;
+}
+
+.rightPart{
+    flex-grow: 1;
+    height: 100%;
+    width:0%;
+    gap:14px;
+}
+
+.playersTab{
+
+    overflow-y: scroll;
+    /* background-color: #721817; */
+
+    display: flex;
+    flex-wrap: wrap;
+	justify-content: center;
+    gap:10px 5px;
+
+    padding-top: 30px;
+    padding-bottom: 30px;
+
+    display: none !important;
+}
+
+.playersMessage{
+
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 80px);
+}
+
+.inputMessage{
+    padding:2px;
+    background-color: #7EBCE6;
+}
+
+.inputMessageInside{
+    background-color: #100803;
+
+    width: 100%;
+    height: 100%;
+    padding: 10px 10px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 25px;
+}
+
+.inputMessageInside > input{
+    background-color: transparent;
+    border-color: transparent;
+
+    color: #FBFEFB;
+    font-size: 16px;
+    font-family: "Jura", sans-serif;
+
+    flex-basis: 100%;
+    width: 0px;
+}
+
+.messages{
+    display: flex;
+
+    gap: 5px;
+    flex-direction: column;
+    overflow-y: scroll;
+    padding: 10px 10px;
+
+    height: 100%;
+}
+
+.messages::before{content: '';  margin-top: auto; }
+
+.message{
+    text-align: left;
+}
+
+.messageYourself{
+    align-self: flex-end;
+    text-align: right;
+}
+
+.inputMessageInside > input:focus{
+    outline: none;
+}
+
+.inputMessageInside > span{
+    color: #7EBCE6;
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+.sectionButtons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    /* background-color: #337; */
+}
+
+.sectionButtons > *{
+    cursor:pointer;
+}
+
+.inputMessage, .inputMessageInside{
+    clip-path: polygon(
+        0% 30%,
+        5% 0%,
+        95% 0%,
+        100% 30%,
+        100% 70%,
+        95% 100%,
+        5% 100%,
+        0% 70%
+    )
+}
+
+.poligonBorder, .poligonBackground{
+	clip-path: polygon(
+		0% 15%,
+		15% 0%,
+		85% 0%,
+		100% 15%,
+		100% 85%,
+		85% 100%,
+		15% 100%,
+		0 85%
+	);
+	
+	display: flex;
+	
+	justify-content:center;
+	align-items: center;
+	gap:5px;
+}
+
+.poligonBorder{
+	padding: 5px;
+}
+
+.poligonBackground{
+	width: 130px;
+	height: 70px;
+}
+
+
+.poligonBorderWhite{
+	background-color: #FBFEFB;
+}
+
+.poligonBackgroundWhite{
+	background-color: #7B7E7B;
+}
+
+.poligonBorderBlue{
+	background-color: #7EBCE6;
+}
+
+.poligonBackgroundBlue{
+	background-color: #0E4C66;
+}
+
+.infoGamerPoligon{
+	clip-path: polygon(
+		0% 0%,
+		90% 0%,
+		100% 10%,
+		100% 100%,
+		10% 100%,
+		0% 90%
+	);
+}
+
+.infoGamerBorder{
+	display: flex;
+	justify-content:center;
+	align-items:center;
+	padding:3px;
+}
+
+.infoGamerInside{
+	padding: 10px;
+}
+
+.infoGamerBorderBlue{
+    background-color: #15616D;
+}
+
+.infoGamerInsideBlue{
+    background-color: #05414D;
+}
+
+.infoGamerBorderPurple{
+    background-color: #935FA7;
+}
+
+.infoGamerInsidePurple{
+    background-color: #733F87;
+}
+
+
+
+.infoGamerBorderRed{
+    background-color: #6D1515;
+}
+
+.infoGamerInsideRed{
+    background-color: #4D0505;
+}
+
+.infoPlayerContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    flex-wrap: wrap;
+
+    flex-basis: 40%;
+    gap:10px 5px;
+}
+
+.infoPlayerContainer > section{
+    display: flex;
+    align-items: center;
+    gap: 3px;
+
+    width: 100px;
+}
+
+.playerName{
+    padding-bottom: 10px;
+}
