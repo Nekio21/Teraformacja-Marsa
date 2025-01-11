@@ -1,0 +1,7 @@
+.activeCircle{
+    display: inline-block;
+    width:10px;
+    height:10px;
+    background-color: #0f0;
+    border-radius: 50%
+}

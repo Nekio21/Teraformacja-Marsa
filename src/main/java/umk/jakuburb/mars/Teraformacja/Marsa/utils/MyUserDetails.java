@@ -20,7 +20,6 @@ public class MyUserDetails implements UserDetailsService {
         this.playerRepository = playerRepository;
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 

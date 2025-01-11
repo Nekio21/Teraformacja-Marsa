@@ -8,6 +8,8 @@ import java.util.List;
 @Entity
 public class Player {
 
+    public enum Role{USER, ADMIN, LEMONIADA}
+
     @Id
     @SequenceGenerator(name="sekwencja", sequenceName = "player_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "sekwencja")
@@ -21,13 +23,16 @@ public class Player {
 
     private List<Role> role;
 
-    public enum Role{USER, ADMIN, LEMONIADA}
+    @ManyToMany(mappedBy = "players", fetch=FetchType.LAZY)
+    private List<Lobby> lobbies;
 
-    public Player(Long id, String login, String passwd, List<Role> role) {
+
+    public Player(Long id, String login, String passwd, List<Role> role, List<Lobby> lobbies) {
         this.id = id;
         this.login = login;
         this.passwd = passwd;
         this.role = role;
+        this.lobbies = lobbies;
     }
 
     public Player(String login, String passwd, List<Role> role) {
@@ -68,5 +73,13 @@ public class Player {
 
     public void setRole(List<Role> role) {
         this.role = role;
+    }
+
+    public List<Lobby> getLobbies() {
+        return lobbies;
+    }
+
+    public void setLobbies(List<Lobby> lobbies) {
+        this.lobbies = lobbies;
     }
 }

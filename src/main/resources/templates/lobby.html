@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lobby</title>
+
+    <script src="../../js/stomp.js"></script>
+    <link rel="stylesheet" href="../../css/lobby.css">
+</head>
+<body>
+
+    <h1>
+        Twoje imie: <span th:text="${nickname}"></span>
+    </h1>
+    <h2>
+        Host: <span th:text="${host}"></span>
+    </h2>
+    <h3>
+        Code: <span th:text="${code}"></span>
+    </h3>
+
+
+    <div>
+        Uzytkownicy:
+        <div id="players" th:each="p: ${players}">
+            <div>
+                <span th:id="'circle' + ${p}" class="activeCircle"></span>
+                <span th:text="${p}" th:id="${p}"></span>
+            </div>
+        </div>
+    </div>
+
+    <a th:if="${ishost} == true" th:href="@{${link}}">Zacznij :)</a>
+    <span th:if="${ishost} == false">Zaczekaj, aż host uruchomi gre :D</span>
+
+    <a>Wyjdz z lobby :(</a>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+            var queueSub = /*[[${subQueue}]]*/;
+            var queueSend = /*[[${sendQueue}]]*/;
+
+        /*]]>*/
+    </script>
+    <script src="../../js/lobby.js"></script>
+</body>
+</html>

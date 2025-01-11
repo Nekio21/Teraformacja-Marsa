@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,8 @@ public class SecurityConfig {
     @Autowired
     private PlayerRepository playerRepository;
 
+
+    //TODO: potem zrob tak by ten csrf byl dostepny
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
@@ -26,7 +29,7 @@ public class SecurityConfig {
                     .requestMatchers("/mars/login/fail").anonymous()
                     .requestMatchers("/mars/login/check").anonymous()
                     .requestMatchers("/css/**", "/js/**", "/assets/**").permitAll()
-                    .anyRequest().authenticated()
+                        .anyRequest().authenticated()
         )
             .formLogin(fl ->
                     fl.usernameParameter("login")
@@ -36,7 +39,7 @@ public class SecurityConfig {
                             .defaultSuccessUrl("/mars/home", true)
                             .failureUrl("/mars/login/fail")
         )
-            .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
