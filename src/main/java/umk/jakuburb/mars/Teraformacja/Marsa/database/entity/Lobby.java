@@ -1,11 +1,12 @@
 package umk.jakuburb.mars.Teraformacja.Marsa.database.entity;
 
 import jakarta.persistence.*;
+import umk.jakuburb.mars.Teraformacja.Marsa.utils.NeedURL;
 
 import java.util.List;
 
 @Entity
-public class Lobby {
+public class Lobby implements NeedURL {
 
     @Id
     @SequenceGenerator(name="sekwencja2", sequenceName = "lobby_seq", allocationSize = 1)
@@ -60,13 +61,7 @@ public class Lobby {
         this.id = id;
     }
 
-    public String getUrl() {
-        return url;
-    }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
 
     public String getCode() {
         return code;
@@ -98,5 +93,14 @@ public class Lobby {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+    @Override
+    public String getUrl() {
+        return url;
+    }
+
+    @Override
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

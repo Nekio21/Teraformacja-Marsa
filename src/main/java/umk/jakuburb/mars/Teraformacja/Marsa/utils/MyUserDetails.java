@@ -2,6 +2,7 @@ package umk.jakuburb.mars.Teraformacja.Marsa.utils;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -35,4 +36,6 @@ public class MyUserDetails implements UserDetailsService {
 
         return new User(username, player.getPasswd(), uprawnieniaLista);
     }
+
+
 }

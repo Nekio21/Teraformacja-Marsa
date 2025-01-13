@@ -8,6 +8,7 @@ import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Lobby;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Player;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.LobbyRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.exception.CodeSpaceException;
+import umk.jakuburb.mars.Teraformacja.Marsa.utils.NeedURL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Random;
 import java.util.UUID;
 
 @Component
-public class GameLobby {
+public class GameLobbyCreator extends Creator{
 
     @Autowired
     private LobbyRepository lobbyRepository;
@@ -23,15 +24,10 @@ public class GameLobby {
     @Autowired
     private RabbitAdmin rabbitAdmin;
 
-    private char[] letter = new char[62];
-    private Random random;
-
     private List<String> allCode;
-    private List<String> allURL;
 
-    public GameLobby(){
-        random = new Random();
-        initLetter();
+    public GameLobbyCreator(){
+        super();
     }
 
     public String create(Player player) throws Exception {
@@ -58,6 +54,19 @@ public class GameLobby {
         FanoutExchange fanoutExchange = new FanoutExchange(name);
         rabbitAdmin.declareExchange(fanoutExchange);
     }
+
+    @Override
+    protected void save(NeedURL nurl) {
+        if(nurl instanceof Lobby){
+            lobbyRepository.save((Lobby)nurl);
+        }
+    }
+
+    @Override
+    protected List<String> getAllURL() {
+        return lobbyRepository.getAllURL();
+    }
+
     private Lobby setCode(Lobby lobby) throws Exception {
         String s = findCode();
 
@@ -67,32 +76,6 @@ public class GameLobby {
 
         lobby.setCode(s);
         return lobbyRepository.save(lobby);
-    }
-
-    private String setURL(Lobby lobby) throws Exception{
-        String URL = findURL();
-
-        if(URL == null){
-            throw new CodeSpaceException();
-        }
-
-        lobby.setUrl(URL);
-        lobbyRepository.save(lobby);
-
-        return URL;
-    }
-
-    private String findURL(){
-        for(int i=0;i<3;i++) {
-            String url = UUID.randomUUID().toString();
-            boolean check = checkURL(url);
-
-            if (check) {
-                return url;
-            }
-        }
-
-        return null;
     }
 
     private String findCode(){
@@ -125,25 +108,5 @@ public class GameLobby {
         allCode = lobbyRepository.getAllCode();
 
         return allCode.stream().noneMatch(code::equals);
-    }
-
-    private boolean checkURL(String URL){
-        allURL = lobbyRepository.getAllURL();
-
-        return allURL.stream().noneMatch(URL::equals);
-    }
-
-    private void initLetter(){
-        for(int i=0; i<10; i++){
-            letter[i] = (char)(48+i);
-        }
-
-        for(int i=10;i<36;i++){
-            letter[i] = (char)(i+55);
-        }
-
-        for(int i=36;i<62;i++){
-            letter[i] = (char)(i+61);
-        }
     }
 }

@@ -26,5 +26,6 @@ public class Loader implements ApplicationRunner {
         playerRepository.save(new Player("wru", passwordEncoder.encode("wru"), List.of(USER, LEMONIADA)));
         playerRepository.save(new Player("Norka", passwordEncoder.encode("Norweg"), List.of(USER)));
         playerRepository.save(new Player("PanJaroslaw", passwordEncoder.encode("PanJaroslaw"), List.of(ADMIN)));
+        playerRepository.save(new Player("truskawka", passwordEncoder.encode("majonez"), List.of(ADMIN)));
     }
 }

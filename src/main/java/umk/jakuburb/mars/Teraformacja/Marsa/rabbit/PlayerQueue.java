@@ -8,6 +8,7 @@ import java.util.List;
 public class PlayerQueue extends CoreQueue{
 
     //TODO: to chyba srednio bezpieczne by podawac nazwe kolejki co nie ???
+    //TODO: spawdzac hedery !!!!!
     //https://stackoverflow.com/questions/31564432/websocket-security
 
     public PlayerQueue(String uniqName, RabbitAdmin rabbitAdmin, RabbitTemplate rabbitTemplate){
@@ -16,14 +17,16 @@ public class PlayerQueue extends CoreQueue{
         addSendFunction(MessageType.USER_IN, this::sendIAmIn);
         addSendFunction(MessageType.USER_OUT, this::sendIAmOut);
 
-        addReceiveFunction(MessageType.USER_IN, this::receiveSbIn);
-        addReceiveFunction(MessageType.USER_OUT, this::receiveSbOut);
+        addReceiveFunction(MessageType.USER_IN, this::dontTouch);
+        addReceiveFunction(MessageType.USER_OUT, this::dontTouch);
 
         addSendFunction(MessageType.USER_ACTIVE, this::userActiveSend);
         addSendFunction(MessageType.USER_INACTIVE, this::userInactiveSend);
 
-        addReceiveFunction(MessageType.USER_ACTIVE, this::userActiveReceive);
-        addReceiveFunction(MessageType.USER_INACTIVE, this::userInactiveReceive);
+        addReceiveFunction(MessageType.USER_ACTIVE, this::dontTouch);
+        addReceiveFunction(MessageType.USER_INACTIVE, this::dontTouch);
+
+        addReceiveFunction(MessageType.GAME_CREATED, this::dontTouch);
     }
 
 
@@ -48,14 +51,6 @@ public class PlayerQueue extends CoreQueue{
         rabbitTemplate.convertAndSend(addressMap.get(Adress.PLAYERS), "", message);
     }
 
-    private MyMessage receiveSbIn(MyMessage receive){
-        return receive;
-    }
-
-    private MyMessage receiveSbOut(MyMessage receive){
-        return receive;
-    }
-
     public void userActiveSend(MyMessage send){
         MyMessage message = new MyMessage();
 
@@ -77,12 +72,12 @@ public class PlayerQueue extends CoreQueue{
         rabbitTemplate.convertAndSend(addressMap.get(Adress.PLAYERS), "", message);
     }
 
-    private MyMessage userActiveReceive(MyMessage receive){
-        return receive;
-    }
+    public void sendGameCreated(String gameURL){
+        MyMessage myMessage = new MyMessage();
+        myMessage.setMessageType(MessageType.GAME_CREATED);
+        myMessage.setMsg(List.of(gameURL));
 
-    private MyMessage userInactiveReceive(MyMessage receive){
-        return receive;
+        sendToPlayers(myMessage);
     }
 
     @Override

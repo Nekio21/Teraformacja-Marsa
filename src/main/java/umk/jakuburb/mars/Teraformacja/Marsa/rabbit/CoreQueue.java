@@ -29,6 +29,8 @@ public abstract class CoreQueue {
     private String queueSubName;
     private String queueSendName;
 
+    //TODO: Moze usuwac uniqname do ostatecznego Receive
+
     public CoreQueue(
             String uniqName,
             RabbitAdmin rabbitAdmin,
@@ -72,6 +74,8 @@ public abstract class CoreQueue {
 
         System.out.println(message);
     }
+
+
 
     protected abstract void notFoundDetailSend(MyMessage m);
 
@@ -128,6 +132,15 @@ public abstract class CoreQueue {
         });
 
         listener.start();
+    }
+
+    protected MyMessage dontTouch(MyMessage message){
+        return message;
+    }
+
+    protected void sendToPlayers(MyMessage message){
+        message.setFrom(uniqName);
+        rabbitTemplate.convertAndSend(addressMap.get(Adress.PLAYERS), "", message);
     }
 
     public String getUniqName() {

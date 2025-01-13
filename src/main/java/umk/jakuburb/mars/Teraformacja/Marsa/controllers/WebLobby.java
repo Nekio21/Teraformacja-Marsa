@@ -1,12 +1,8 @@
 package umk.jakuburb.mars.Teraformacja.Marsa.controllers;
 
 import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +14,11 @@ import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Lobby;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Player;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.LobbyRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.PlayerRepository;
-import umk.jakuburb.mars.Teraformacja.Marsa.game.GameLobby;
+import umk.jakuburb.mars.Teraformacja.Marsa.game.GameLobbyCreator;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.Adress;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.MyMessage;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.MySession;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -34,7 +29,7 @@ public class WebLobby {
     //TODO: potem stworz sersy i tam ma byc cala logika
 
     @Autowired
-    private GameLobby gameLobby;
+    private GameLobbyCreator gameLobbyCreator;
 
     @Autowired
     private MySession mySession;
@@ -51,22 +46,6 @@ public class WebLobby {
     @Autowired
     private LobbyRepository lobbyRepository;
 
-
-//    @GetMapping("/{url}/createGame")
-//    public String createGame(@PathVariable String url){
-//
-//        Player host = getPlayer();
-//        Optional<Lobby> lobby = lobbyRepository.findByUrl(url);
-//
-//        if(!host.getId().equals(lobby.get().getHost().getId()) || lobby.get().getPlayers().size() != 4){
-//            return "redirect ze jest zle"
-//        }
-//
-//        //TODO: tworzymy gre :D
-//
-//        return "";
-//    }
-
     @GetMapping("/{url}")
     public String lobby(@PathVariable String url, Model model){
 
@@ -76,7 +55,7 @@ public class WebLobby {
             return "redirect:/mars/error";
         }
 
-        Player player2 = getPlayer();
+        Player player2 = mySession.getPlayer();
 
         boolean isPlayer = lobby.get().getPlayers().stream().anyMatch(new Predicate<Player>() {
             @Override
@@ -96,7 +75,7 @@ public class WebLobby {
         model.addAttribute("ishost", lobby.get().getHost().getLogin().equals(player2.getLogin()));
         model.addAttribute("code", lobby.get().getCode());
         model.addAttribute("players", lobby.get().getPlayers().stream().map(Player::getLogin).toList());
-        model.addAttribute("link", "/mars/lobby/" + url + "/createGame");
+        model.addAttribute("link", "/mars/game/" + url + "/createGame");
 
 
         mySession.getPlayerQueue().createBinding(new FanoutExchange("Lobby" + lobby.get().getUrl()));
@@ -111,14 +90,14 @@ public class WebLobby {
         String URL = "";
 
         try {
-            URL = gameLobby.create(getPlayer());
+            URL = gameLobbyCreator.create(mySession.getPlayer());
         }catch (Exception e) {
             System.out.println("bład[WebLobby(create)]: " + e);
 
             return "redirect:/mars/error";
         }
 
-        gameLobby.createExchange("Lobby" + URL);
+        gameLobbyCreator.createExchange("Lobby" + URL);
 
         return "redirect:/mars/lobby/" + URL;
     }
@@ -132,7 +111,7 @@ public class WebLobby {
             return "redirect:/mars/home";
         }
 
-        Player player = getPlayer();
+        Player player = mySession.getPlayer();
 
         if(lobby.get().getPlayers().stream().noneMatch(e->player.getLogin().equals(e.getLogin()))) {
             lobby.get().getPlayers().add(player);
@@ -142,15 +121,5 @@ public class WebLobby {
         String URL = lobby.get().getUrl();
 
         return  "redirect:/mars/lobby/" + URL;
-    }
-
-
-    private Player getPlayer(){
-        UserDetails playerInfo = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Player player = playerRepository.findByLogin(playerInfo.getUsername())
-                .orElseThrow(()->null);
-
-        return player;
     }
 }

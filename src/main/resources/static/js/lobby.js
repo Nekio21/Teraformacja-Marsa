@@ -54,6 +54,13 @@ async function startWS(){
                 let circle = document.getElementById("circle" + msg.msg[0]);
                 circle.style["background-color"] = "#f00";
             }
+            else if(msg.messageType == "GAME_CREATED"){
+                let newA = document.createElement("a");
+                newA.href = window.location.origin + msg.msg[0];
+                newA.innerHTML = "wejdz do gry :D";
+
+                document.body.appendChild(newA);
+            }
         });
     }
 

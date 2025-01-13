@@ -26,13 +26,16 @@ public class Player {
     @ManyToMany(mappedBy = "players", fetch=FetchType.LAZY)
     private List<Lobby> lobbies;
 
+    @ManyToMany(mappedBy = "players", fetch=FetchType.LAZY)
+    private List<Game> games;
 
-    public Player(Long id, String login, String passwd, List<Role> role, List<Lobby> lobbies) {
+    public Player(Long id, String login, String passwd, List<Role> role, List<Lobby> lobbies, List<Game> games) {
         this.id = id;
         this.login = login;
         this.passwd = passwd;
         this.role = role;
         this.lobbies = lobbies;
+        this.games = games;
     }
 
     public Player(String login, String passwd, List<Role> role) {
@@ -81,5 +84,13 @@ public class Player {
 
     public void setLobbies(List<Lobby> lobbies) {
         this.lobbies = lobbies;
+    }
+
+    public List<Game> getGames() {
+        return games;
+    }
+
+    public void setGames(List<Game> games) {
+        this.games = games;
     }
 }
