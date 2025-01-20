@@ -31,31 +31,4 @@ public class RabbitConfig {
         return new Jackson2JsonMessageConverter();
     }
 
-
-    //System
-
-    @Bean
-    public DirectExchange system(){
-        return new DirectExchange("System");
-    }
-
-    @Bean
-    public Queue getLobby(){
-        return new Queue("lobby.get");
-    }
-
-    @Bean
-    public Queue createLobby(){
-        return new Queue("lobby.create");
-    }
-
-    @Bean
-    public Binding bindingGetLobby(Queue getLobby, DirectExchange system){
-        return BindingBuilder.bind(getLobby).to(system).with("lobby.get");
-    }
-
-    @Bean
-    public Binding bindingCreateLobby(Queue createLobby, DirectExchange system){
-        return BindingBuilder.bind(createLobby).to(system).with("lobby.create");
-    }
 }

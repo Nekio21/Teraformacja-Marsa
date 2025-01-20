@@ -3,6 +3,7 @@ package umk.jakuburb.mars.Teraformacja.Marsa.controllers;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,7 +80,7 @@ public class GameController {
 
 
     @GetMapping("/{url}")
-    public String game(@PathVariable String url){
+    public String game(@PathVariable String url, Model model){
         Optional<Game> game = gameRepository.findByUrl(url);
         Player mySessionPlayer = mySession.getPlayer();
 
@@ -99,8 +100,12 @@ public class GameController {
         }
 
         mySession.getPlayerQueue().createBinding(new FanoutExchange(GameCreator.EXCHANGE_USERS_NAME_START + game.get().getUrl()));
-        mySession.getPlayerQueue().addAddress(Adress.PLAYERS, GameCreator.EXCHANGE_GAME_NAME_START + game.get().getUrl());
+        mySession.getPlayerQueue().addAddress(Adress.PLAYERS, GameCreator.EXCHANGE_USERS_NAME_START + game.get().getUrl());
         mySession.getPlayerQueue().sendIAmIn(new MyMessage());
+
+        model.addAttribute("name", mySessionPlayer.getLogin());
+        model.addAttribute("subQueue", mySession.getPlayerQueue().getQueueSubName());
+        model.addAttribute("sendQueue", mySession.getPlayerQueue().getQueueSendName());
 
         return "game";
     }

@@ -3,10 +3,12 @@ package umk.jakuburb.mars.Teraformacja.Marsa.game;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Player;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.GameRepository;
+import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.GameQueue;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.NeedURL;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Game;
 
@@ -21,6 +23,9 @@ public class GameCreator extends Creator{
 
     @Autowired
     private RabbitAdmin rabbitAdmin;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     public static final String EXCHANGE_USERS_NAME_START = "Users";
     public static final String EXCHANGE_GAME_NAME_START = "Game";
@@ -53,9 +58,10 @@ public class GameCreator extends Creator{
         FanoutExchange usersExchange = new FanoutExchange(EXCHANGE_USERS_NAME_START + name);
         rabbitAdmin.declareExchange(usersExchange);
 
-        DirectExchange gameExchange = new DirectExchange(EXCHANGE_GAME_NAME_START + name);
-        rabbitAdmin.declareExchange(gameExchange);
+        GameQueue gameQueue = new GameQueue(EXCHANGE_GAME_NAME_START + name, EXCHANGE_USERS_NAME_START + name, rabbitAdmin, rabbitTemplate);
     }
+
+
 
     @Override
     protected void save(NeedURL nurl) {

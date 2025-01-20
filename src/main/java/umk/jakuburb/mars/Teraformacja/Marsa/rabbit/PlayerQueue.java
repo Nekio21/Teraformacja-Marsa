@@ -27,8 +27,35 @@ public class PlayerQueue extends CoreQueue{
         addReceiveFunction(MessageType.USER_INACTIVE, this::dontTouch);
 
         addReceiveFunction(MessageType.GAME_CREATED, this::dontTouch);
+
+        addSendFunction(MessageType.MESSAGE_SEND, this::messageSend);
+        addReceiveFunction(MessageType.MESSAGE_SEND, this::messageReceive);
     }
 
+
+    private void messageSend(MyMessage send){
+        MyMessage message = new MyMessage();
+
+        message.setFrom(uniqName);
+        message.setMessageType(MessageType.MESSAGE_SEND);
+        message.setMsg(List.of(send.getMsg().get(0), uniqName));
+
+        rabbitTemplate.convertAndSend(addressMap.get(Adress.PLAYERS), "", message);
+        }
+
+        private MyMessage messageReceive(MyMessage send){
+
+            if(send.getFrom().equals(uniqName)){
+                MyMessage msg = new MyMessage();
+                msg.setFrom(uniqName);
+                msg.setMessageType(MessageType.MESSAGE_SEND);
+                msg.setMsg(List.of(send.getMsg().get(0)));
+
+                return msg;
+        }else{
+            return send;
+        }
+    }
 
     public void sendIAmIn(MyMessage send){
         MyMessage message = new MyMessage();

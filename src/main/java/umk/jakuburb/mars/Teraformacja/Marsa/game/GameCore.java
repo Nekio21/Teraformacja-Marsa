@@ -1,15 +1,20 @@
 package umk.jakuburb.mars.Teraformacja.Marsa.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameCore {
-
-    //odwzorowanie wszystkiego co widac w grze, czyli chat, ile kto ma zadob, jakie kto ma karty itp
-    //private Game game;
-
-    private int timer;
+    private List<ChatRecord> chat;
 
     public GameCore(){
-        timer = 0;
+        chat = new ArrayList<>();
     }
 
+    public List<ChatRecord> getChat() {
+        return chat;
+    }
 
+    public void setChat(List<ChatRecord> chat) {
+        this.chat = chat;
+    }
 }

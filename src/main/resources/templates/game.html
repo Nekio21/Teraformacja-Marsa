@@ -19,9 +19,7 @@
 </head>
 <body>
     <header class="topbar">
-        <header>
-            Adrian
-        </header>
+        <header th:text="${name}"></header>
         <section>
             <section>
                 <img src="../../assets/gold.png" alt="gold icon" width="30px" height="30px"/>
@@ -739,7 +737,7 @@
             </section>
             
             <section class="playersMessage">
-                <section class="messages">
+                <section class="messages" id="msgContainer">
                     <section class="message">
                         nterdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam a ex et turpis iaculis semper. 
                     </section>
@@ -764,8 +762,9 @@
                 </section>
                 <div class="inputMessage">
                     <div class="inputMessageInside">
-                        <input type="text"/>
-                        <span class="material-symbols-outlined">
+                        <input type="text" id="messageContainer"/>
+
+                        <span class="material-symbols-outlined" onclick="sendMessage()">
                             send
                         </span>
                     </div>
@@ -792,5 +791,17 @@
             </section>
         </nav>
     </main>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+            var queueSub = /*[[${subQueue}]]*/;
+            var queueSend = /*[[${sendQueue}]]*/;
+
+        /*]]>*/
+    </script>
+
+    <script src="../../js/stomp.js"></script>
+    <script src="../../js/game.js"></script>
 </body>
 </html>
