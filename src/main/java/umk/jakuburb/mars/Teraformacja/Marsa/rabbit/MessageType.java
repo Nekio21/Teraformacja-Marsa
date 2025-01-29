@@ -5,5 +5,5 @@ public enum MessageType {
 
     MESSAGE_SEND,
 
-    CLOCK
+    CLOCK, RECOVER, ERROR
 }

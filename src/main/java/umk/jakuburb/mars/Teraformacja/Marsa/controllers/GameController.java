@@ -15,6 +15,7 @@ import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.LobbyRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.PlayerRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.game.GameCreator;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.Adress;
+import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.GameQueue;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.MyMessage;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.MySession;
 
@@ -72,7 +73,9 @@ public class GameController {
             return "redirect:/mars/error";
         }
 
-        gameCreator.createExchange(gameURL);
+        GameQueue gameQueue = (GameQueue) gameCreator.createExchange(gameURL);
+        gameQueue.getGameDate().setPlayers(lobby.get().getPlayers().stream().map(Player::getLogin).toList());
+
         mySession.getPlayerQueue().sendGameCreated("/mars/game/" + gameURL);
 
         return "redirect:/mars/game/" + gameURL;
@@ -101,7 +104,9 @@ public class GameController {
 
         mySession.getPlayerQueue().createBinding(new FanoutExchange(GameCreator.EXCHANGE_USERS_NAME_START + game.get().getUrl()));
         mySession.getPlayerQueue().addAddress(Adress.PLAYERS, GameCreator.EXCHANGE_USERS_NAME_START + game.get().getUrl());
+        mySession.getPlayerQueue().addAddress(Adress.GAMECORE, GameCreator.EXCHANGE_GAME_NAME_START + game.get().getUrl());
         mySession.getPlayerQueue().sendIAmIn(new MyMessage());
+        mySession.getPlayerQueue().recoverSend(new MyMessage());
 
         model.addAttribute("name", mySessionPlayer.getLogin());
         model.addAttribute("subQueue", mySession.getPlayerQueue().getQueueSubName());

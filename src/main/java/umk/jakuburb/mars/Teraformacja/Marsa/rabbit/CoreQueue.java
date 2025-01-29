@@ -5,6 +5,7 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import umk.jakuburb.mars.Teraformacja.Marsa.game.GameData;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -13,17 +14,22 @@ import java.util.function.Function;
 
 public abstract class CoreQueue {
     protected RabbitTemplate rabbitTemplate;
-
     private RabbitAdmin rabbitAdmin;
 
     protected Queue queueSUB;
     protected Queue queueSEND;
     protected Queue queuePreSUB;
 
+    public static final String PRESUB_BEFORE_NAME = "kolejkaPreSub";
+    public static final String SUB_BEFORE_NAME = "kolejkaSub";
+    public static final String SEND_BEFORE_NAME = "kolejkaSend";
+
     private HashMap<MessageType, Consumer<MyMessage>> sendMap;
     private HashMap<MessageType, Function<MyMessage, MyMessage>> receiveMap;
 
     protected HashMap<Adress, String> addressMap;
+
+    protected GameData gameData;
 
     protected String uniqName;
     private String queueSubName;
@@ -40,6 +46,7 @@ public abstract class CoreQueue {
         this.rabbitAdmin = rabbitAdmin;
 
         this.uniqName = uniqName;
+        gameData = new GameData();
 
         sendMap = new HashMap<>();
         receiveMap = new HashMap<>();
@@ -84,11 +91,11 @@ public abstract class CoreQueue {
     private void queueInit(String uniqName){
         Random random = new Random();
 
-        queueSubName = "kolejkaSub" + uniqName + (100000 + random.nextInt(100000));
-        queueSendName = "kolejkaSend" + uniqName + (100000 + random.nextInt(100000));
+        queueSubName = SUB_BEFORE_NAME + uniqName + (100000 + random.nextInt(100000));
+        queueSendName = SEND_BEFORE_NAME + uniqName + (100000 + random.nextInt(100000));
 
         queueSUB = new Queue(queueSubName);
-        queuePreSUB = new Queue("kolejkaPreSub" + uniqName);
+        queuePreSUB = new Queue(PRESUB_BEFORE_NAME + uniqName);
         queueSEND = new Queue(queueSendName);
 
         rabbitAdmin.declareQueue(queueSUB);

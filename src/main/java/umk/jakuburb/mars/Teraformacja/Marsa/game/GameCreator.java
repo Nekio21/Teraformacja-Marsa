@@ -11,6 +11,7 @@ import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.GameRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.GameQueue;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.NeedURL;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Game;
+import umk.jakuburb.mars.Teraformacja.Marsa.utils.Timer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class GameCreator extends Creator{
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private Timer timer;
 
     public static final String EXCHANGE_USERS_NAME_START = "Users";
     public static final String EXCHANGE_GAME_NAME_START = "Game";
@@ -54,13 +58,19 @@ public class GameCreator extends Creator{
     }
 
     @Override
-    public void createExchange(String name) {
+    public Object createExchange(String name) {
         FanoutExchange usersExchange = new FanoutExchange(EXCHANGE_USERS_NAME_START + name);
         rabbitAdmin.declareExchange(usersExchange);
 
-        GameQueue gameQueue = new GameQueue(EXCHANGE_GAME_NAME_START + name, EXCHANGE_USERS_NAME_START + name, rabbitAdmin, rabbitTemplate);
+        return setupGameQueue(name);
     }
 
+    private GameQueue setupGameQueue(String name){
+        GameQueue gameQueue = new GameQueue(EXCHANGE_GAME_NAME_START + name, EXCHANGE_USERS_NAME_START + name, rabbitAdmin, rabbitTemplate);
+        timer.subscribe(gameQueue);
+
+        return gameQueue;
+    }
 
 
     @Override

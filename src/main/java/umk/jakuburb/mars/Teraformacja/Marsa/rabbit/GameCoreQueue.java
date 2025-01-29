@@ -6,18 +6,21 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 
+import java.util.HashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class GameCoreQueue {
 
-    private RabbitTemplate rabbitTemplate;
+    protected RabbitTemplate rabbitTemplate;
     private RabbitAdmin rabbitAdmin;
 
     private DirectExchange directExchange;
-    protected Queue clock;
     protected Queue helpPlayers;
 
     private String uniqName;
+
+    private HashMap<MessageType, Consumer<MyMessage>> receiveMap;
 
     public static final String CLOCK_EXCHANGE_NAME = "games.clock";
 
@@ -30,32 +33,48 @@ public abstract class GameCoreQueue {
         this.rabbitAdmin = rabbitAdmin;
         this.rabbitTemplate = rabbitTemplate;
 
+        receiveMap = new HashMap<>();
+
         init();
     }
 
     private void init(){
-        String clockQueueName = "clock." + uniqName;
         String helpQueueName = "help.players." + uniqName;
 
-        clock = new Queue(clockQueueName);
         helpPlayers = new Queue(helpQueueName);
 
         directExchange = new DirectExchange(uniqName);
-        FanoutExchange fanoutExchange = new FanoutExchange(CLOCK_EXCHANGE_NAME);
+        //FanoutExchange fanoutExchange = new FanoutExchange(CLOCK_EXCHANGE_NAME);
 
-        rabbitAdmin.declareQueue(clock);
         rabbitAdmin.declareQueue(helpPlayers);
         rabbitAdmin.declareExchange(directExchange);
-        rabbitAdmin.declareExchange(fanoutExchange);
+        //rabbitAdmin.declareExchange(fanoutExchange);
 
-        Binding binding1 = BindingBuilder.bind(clock).to(fanoutExchange);
         Binding binding2 = BindingBuilder.bind(helpPlayers).to(directExchange).with("help");
 
-        rabbitAdmin.declareBinding(binding1);
         rabbitAdmin.declareBinding(binding2);
+
+        addQueueListener(helpPlayers, this::receive);
     }
 
-    protected void addQueueListener(RabbitAdmin rabbitAdmin, Queue queue, Consumer<MyMessage> func){
+    protected void addReceiveFunction(MessageType type, Consumer<MyMessage> fun){
+        receiveMap.put(type, fun);
+    }
+
+    protected void monitorUserMove(){
+
+    }
+
+    private void receive(MyMessage message){
+        Consumer<MyMessage> fun = receiveMap.getOrDefault(message.getMessageType(), this::notFoundTypeReceive);
+        fun.accept(message);
+
+        System.out.println(message);
+    }
+
+    protected abstract MyMessage notFoundTypeReceive(MyMessage m);
+
+    private void addQueueListener(Queue queue, Consumer<MyMessage> func){
         SimpleMessageListenerContainer listener = new SimpleMessageListenerContainer(
                 rabbitAdmin.getRabbitTemplate().getConnectionFactory()
         );

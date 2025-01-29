@@ -45,7 +45,47 @@ async function startWS(){
 
                 messageContainer.appendChild(section);
            }
+           else if(msg.messageType == "CLOCK"){
+                if(msg.msg[0]=="true"){
+                    console.log("twoj ruch: " + msg.msg[1]);
+                } else if(msg.msg[0]=="false"){
+                    console.log("czyjs ruch: " + msg.msg[1]);
+                }
+           }
+            else if(msg.messageType == "RECOVER"){
+                if(msg.recoverType == "CHAT"){
+                    console.log("aa")
+                    messageContainer.innerHTML = "";
+                    console.log("aa")
+                    console.log(msg.chat)
+                    console.log("aa")
+                    for(let i=0; i<msg.chatMessage.length; i++){
+                         console.log("aa" + i)
+                        let section = document.createElement("section");
 
+                        if(msg.chatMessage[i].user != playerName){
+                            let name = document.createElement("span");
+                            let msgSpan = document.createElement("span");
+
+                            section.className = "message";
+                            msgSpan.innerHTML = msg.chatMessage[i].msg
+                            name.innerHTML = msg.chatMessage[i].user
+
+                            name.style.color = "#f00";
+
+                            section.appendChild(name);
+                            section.appendChild(msgSpan);
+                        }
+                        else if(msg.chatMessage[i].user == playerName){
+                            section.className = "messageYourself";
+                            section.innerHTML = msg.chatMessage[i].msg
+                        }
+
+                        messageContainer.appendChild(section);
+                    }
+
+                }
+            }
 
         });
     }

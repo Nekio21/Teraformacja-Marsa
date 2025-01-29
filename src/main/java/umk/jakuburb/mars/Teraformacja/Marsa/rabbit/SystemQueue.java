@@ -19,8 +19,4 @@ public class SystemQueue {
 
     }
 
-    @Scheduled(fixedDelay = 1000)
-    public void clockMethod(){
-        rabbitTemplate.convertAndSend(GameCoreQueue.CLOCK_EXCHANGE_NAME, "", new MyMessage(MessageType.CLOCK, NAME, List.of("true"), ""));
-    }
 }

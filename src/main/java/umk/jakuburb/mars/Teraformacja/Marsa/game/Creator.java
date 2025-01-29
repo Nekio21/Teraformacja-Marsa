@@ -25,7 +25,7 @@ public abstract class Creator {
 
     public abstract String create(Player player) throws Exception;
 
-    public abstract void createExchange(String name);
+    public abstract Object createExchange(String name);
 
 
     protected String setURL(NeedURL nurl) throws Exception{

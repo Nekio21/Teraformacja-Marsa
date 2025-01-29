@@ -50,9 +50,11 @@ public class GameLobbyCreator extends Creator{
     }
 
 
-    public void createExchange(String name){
+    public Object createExchange(String name){
         FanoutExchange fanoutExchange = new FanoutExchange(name);
         rabbitAdmin.declareExchange(fanoutExchange);
+
+        return null;
     }
 
     @Override
