@@ -5,24 +5,41 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.MessageType;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.MyMessage;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public abstract class GameCoreQueue {
 
     protected RabbitTemplate rabbitTemplate;
     private RabbitAdmin rabbitAdmin;
-
     private DirectExchange directExchange;
     protected Queue helpPlayers;
-
     private String uniqName;
 
     private HashMap<MessageType, Consumer<MyMessage>> receiveMap;
-
     public static final String CLOCK_EXCHANGE_NAME = "games.clock";
+
+    public enum GameState{
+        WAITING,
+        CHOSE_CARDS,
+        BEFORE_ROUND,
+        ROUND,
+        AFTER_ROUND,
+        END_GAME
+    }
+
+    public enum UserState{
+        WAITING,
+        CHOSE_MAIN_CARD,
+        CHOSE_CARD,
+        NO_MOVE,
+        FIRST_MOVE,
+        SECOND_MOVE,
+
+    }
 
     public GameCoreQueue(
             String uniqName,
@@ -91,7 +108,7 @@ public abstract class GameCoreQueue {
 
                 func.accept(myMessageLite);
             }catch(Exception e){
-                System.out.println("Bład[CoreQueue(addQueueListener)]: " + e);
+                System.out.println("Bład[GameCoreQueue(addQueueListener)]: " + e);
             }
         });
 

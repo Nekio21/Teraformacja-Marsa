@@ -23,35 +23,35 @@
         <section>
             <section>
                 <img src="../../assets/gold.png" alt="gold icon" width="30px" height="30px"/>
-                <span>127 [+17]</span>
+                <span id="goldR">127 [+17]</span>
             </section>
             <section>
                 <img src="../../assets/metal.png" alt="metal icon" width="30px" height="30px"/>
-                <span>13 [+3 :2]</span>
+                <span id="metalR">13 [+3 :2]</span>
             </section>
             <section>
                 <img src="../../assets/titanium.png" alt="titanium icon" width="30px" height="30px"/>
-                <span>13 [+3 :3]</span>
+                <span id="titaniumR">13 [+3 :3]</span>
             </section>
 
             <section>
                 <img src="../../assets/plants.png" alt="plants icon" width="30px" height="30px"/>
-                <span>13 [+3 /3]</span>
+                <span id="plantsR">13 [+3 /3]</span>
             </section>
             <section>
                 <img src="../../assets/energy.png" alt="energy icon" width="30px" height="30px"/>
-                <span>13 [+3]</span>
+                <span id="energyR">13 [+3]</span>
             </section>
             <section class="lastResource">
                 <img src="../../assets/heat.png" alt="heat icon" width="30px" height="30px"/>
-                <span>13 [+3 /8]</span>
+                <span id="heatR">13 [+3 /8]</span>
             </section>
         
 			<div class="endRound">Zakończ runde</div>
 		</section>
     </header>
 
-    <main class="mainPart">
+    <main id="mainPart" class="mainPart">
         <nav class="leftPart">
             <section class="gameStat">
                 <header>Warunki końca gry</header>
@@ -770,6 +770,9 @@
             </section>
         </nav>
     </main>
+
+    <div id="cards">
+    </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/

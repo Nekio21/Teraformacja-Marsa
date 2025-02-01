@@ -5,7 +5,9 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import umk.jakuburb.mars.Teraformacja.Marsa.game.GameData;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameData;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.MessageType;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.MyMessage;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -75,14 +77,14 @@ public abstract class CoreQueue {
     public void fullReceive(MyMessage message){
         Function<MyMessage, MyMessage> fun = receiveMap.getOrDefault(message.getMessageType(), this::notFoundDetailReceive);
 
-        Object result = fun.apply(message);
+        MyMessage result = fun.apply(message);
 
-        rabbitTemplate.convertAndSend(queueSUB.getName(), result);
-
-        System.out.println(message);
+        if(result != null) {
+            rabbitTemplate.convertAndSend(queueSUB.getName(), result);
+            System.out.println(result);
+            System.out.println(result.toString());
+        }
     }
-
-
 
     protected abstract void notFoundDetailSend(MyMessage m);
 

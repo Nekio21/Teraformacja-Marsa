@@ -2,9 +2,10 @@ package umk.jakuburb.mars.Teraformacja.Marsa.rabbit;
 
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import umk.jakuburb.mars.Teraformacja.Marsa.game.ChatRecord;
-import umk.jakuburb.mars.Teraformacja.Marsa.game.GameData;
-import umk.jakuburb.mars.Teraformacja.Marsa.game.GameDataCheck;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.*;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameData;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataCheck;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataProces;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public class PlayerQueue extends CoreQueue{
     //TODO: to chyba srednio bezpieczne by podawac nazwe kolejki co nie ???
     //TODO: spawdzac hedery !!!!!
     //https://stackoverflow.com/questions/31564432/websocket-security
+
+    //TODO: java.net.SocketException: An established connection was aborted by the software in your host machine
 
     public PlayerQueue(String uniqName, RabbitAdmin rabbitAdmin, RabbitTemplate rabbitTemplate){
         super(uniqName, rabbitAdmin, rabbitTemplate);
@@ -37,9 +40,19 @@ public class PlayerQueue extends CoreQueue{
         addReceiveFunction(MessageType.CLOCK, this::clock);
         addReceiveFunction(MessageType.RECOVER, this::recover);
 
-        addSendFunction(MessageType.RECOVER, this::recoverSend);
+        addSendFunction(MessageType.MAIN_CARDS, this::mainCardSend);
+        addReceiveFunction(MessageType.MAIN_CARDS_SAVE, this::save);
+        //addSendFunction(MessageType.RECOVER, this::recoverSend);
+        addSendFunction(MessageType.CARDS10, this::sendToGame);
+
+        addReceiveFunction(MessageType.RESOURCES, this::save);
+        addReceiveFunction(MessageType.CARDS, this::save);
     }
 
+    private void mainCardSend(MyMessage msg){
+        msg.setFrom(uniqName);
+        rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),"help", msg);
+    }
 
     private void messageSend(MyMessage send){
         MyMessage message = new MyMessage();
@@ -67,9 +80,23 @@ public class PlayerQueue extends CoreQueue{
         }
     }
 
-    public void recoverSend(MyMessage msg){
+    public void gameIn(){
+        userInGame();
+        recoverSend();
+    }
+    private void recoverSend(){
+        MyMessage msg = new MyMessage();
         msg.setFrom(uniqName);
         msg.setMessageType(MessageType.RECOVER);
+        msg.setMsg(List.of(uniqName));
+
+        rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),"help", msg);
+    }
+
+    private void userInGame(){
+        MyMessage msg = new MyMessage();
+        msg.setFrom(uniqName);
+        msg.setMessageType(MessageType.PLAYER_IN_GAME);
         msg.setMsg(List.of(uniqName));
 
         rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),"help", msg);
@@ -78,7 +105,7 @@ public class PlayerQueue extends CoreQueue{
     private MyMessage recover(MyMessage msg){
         GameData gameData = msg.getGameData();
 
-        List<GameDataCheck> check = GameData.check(gameData, this.gameData);
+        List<GameDataCheck> check = GameDataProces.check(gameData, this.gameData, uniqName);
 
         for(GameDataCheck gdc: check) {
             MyMessage msgToSend = new MyMessage();
@@ -95,6 +122,53 @@ public class PlayerQueue extends CoreQueue{
                 case CHAT -> {
                     msgToSend.setChat(gameData.getChat());
                     this.gameData.setChat(gameData.getChat());
+                }
+                case MAIN_CARD -> {
+                    msgToSend.setOwners(gameData.getPlayers());
+                    msgToSend.setDataLong(gameData.getPlayers().stream().map(e->gameData.getMainCards().get(e)).toList());
+                    this.gameData.setMainCards(gameData.getMainCards());
+                }
+                case USED_CARDS_BLUE -> {
+                    msgToSend.setOwners(gameData.getPlayers());
+                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getUsedCardBlue().get(e)).toList());
+                    this.gameData.setUsedCardBlue(gameData.getUsedCardBlue());
+                }
+                case USED_CARDS_RED ->{
+                    msgToSend.setOwners(gameData.getPlayers());
+                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getUsedCardRed().get(e)).toList());
+                    this.gameData.setUsedCardRed(gameData.getUsedCardRed());
+                }
+                case USED_CARDS_GREEN ->{
+                    msgToSend.setOwners(gameData.getPlayers());
+                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getUsedCardGreen().get(e)).toList());
+                    this.gameData.setUsedCardGreen(gameData.getUsedCardGreen());
+                }
+                case CARD ->{
+                    msgToSend.setOwners(gameData.getPlayers());
+                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getCards().get(e)).toList());
+                    this.gameData.setCards(gameData.getCards());
+                }
+                case RESOURCES ->{
+                    msgToSend.setOwners(gameData.getPlayers());
+                    msgToSend.setResources(gameData.getPlayers().stream().map(e->gameData.getResources().get(e)).toList());
+                    this.gameData.setResources(gameData.getResources());
+                }
+                case PLANET ->{
+                    msgToSend.setMsg(gameData.getPlanet().stream().map(Enum::toString).toList());
+                    this.gameData.setPlanet(gameData.getPlanet());
+                }
+                case LEVEL ->{
+                    msgToSend.setOwners(gameData.getPlayers());
+                    msgToSend.setDataLong(gameData.getPlayers().stream().map(e->gameData.getLevel().get(e)).toList());
+
+                    this.gameData.setLevel(gameData.getLevel());
+                }
+                case OTHERS ->{
+                    msgToSend.setMsg(List.of(gameData.getRound(), gameData.getTemp(), gameData.getCo2(), gameData.getOcean()).stream().map(String::valueOf).toList());
+                    this.gameData.setRound(gameData.getRound());
+                    this.gameData.setTemp(gameData.getTemp());
+                    this.gameData.setCo2(gameData.getCo2());
+                    this.gameData.setOcean(gameData.getOcean());
                 }
             }
 
@@ -169,7 +243,27 @@ public class PlayerQueue extends CoreQueue{
             myMessage.setMsg(List.of("false", message.getMsg().get(1)));
         }
 
-        return myMessage;
+        //return myMessage;
+        return null;
+    }
+
+    private MyMessage save(MyMessage msg){
+        switch (msg.getMessageType()){
+            case MAIN_CARDS_SAVE -> {
+                gameData.getMainCards().put(msg.getMsg().get(0), msg.getCards().get(0).getIndex());
+                return msg;
+            }
+            case CARDS -> {
+                gameData.getCards().put(uniqName, msg.getCards().stream().map(CardToSend::getIndex).toList());
+                return msg;
+            }
+            case RESOURCES -> {
+                gameData.getResources().put(msg.getAbout(), msg.getResources().get(msg.getOwners().indexOf(msg.getAbout())));
+                return msg;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -186,5 +280,10 @@ public class PlayerQueue extends CoreQueue{
     @Override
     protected MyMessage notFoundDetailReceive(MyMessage m) {
         return m;
+    }
+
+    private void sendToGame(MyMessage m){
+        m.setFrom(uniqName);
+        rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE), "help", m);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Player;
+import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.CardRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.GameRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.GameQueue;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.NeedURL;
@@ -21,6 +22,9 @@ public class GameCreator extends Creator{
 
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private CardRepository cardRepository;
 
     @Autowired
     private RabbitAdmin rabbitAdmin;
@@ -67,6 +71,7 @@ public class GameCreator extends Creator{
 
     private GameQueue setupGameQueue(String name){
         GameQueue gameQueue = new GameQueue(EXCHANGE_GAME_NAME_START + name, EXCHANGE_USERS_NAME_START + name, rabbitAdmin, rabbitTemplate);
+        gameQueue.setCardRepository(cardRepository);
         timer.subscribe(gameQueue);
 
         return gameQueue;

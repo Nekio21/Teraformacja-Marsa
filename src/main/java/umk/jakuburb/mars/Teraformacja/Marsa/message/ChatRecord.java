@@ -1,4 +1,4 @@
-package umk.jakuburb.mars.Teraformacja.Marsa.game;
+package umk.jakuburb.mars.Teraformacja.Marsa.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -16,7 +16,7 @@ import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.LobbyRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.PlayerRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.game.GameLobbyCreator;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.Adress;
-import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.MyMessage;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.MyMessage;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.MySession;
 
 import java.util.Optional;
