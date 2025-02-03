@@ -62,21 +62,74 @@ public class Resources implements Serializable {
         this.titanium = titanium;
     }
 
-    public void put(CardSkills.Resource resource, int amount, boolean plus){
+    public void fill(){
+        gold = gold + goldProd;
+        energy = energy + energyProd;
+        heat = heat + heatProd;
+        metal = metal + metalProd;
+        plants = plants + plantsProd;
+        titanium = titanium + titaniumProd;
+    }
+
+    public Error put(CardSkills.Resource resource, int amount, boolean plus){
+        int value = 0;
         switch(resource){
-            case GOLD_PROD -> goldProd = goldProd + amount * (plus?1:-1);
-            case GOLD -> gold = gold + amount * (plus?1:-1);
-            case ENERGY_PROD -> energyProd = energyProd + amount * (plus?1:-1);
-            case ENERGY -> energy = energy + amount * (plus?1:-1);
-            case HEAT_PROD -> heatProd = heatProd + amount * (plus?1:-1);
-            case HEAT -> heat = heat + amount * (plus?1:-1);
-            case METAL_PROD -> metalProd = metalProd + amount * (plus?1:-1);
-            case METAL -> metal = metal + amount * (plus?1:-1);
-            case PLANTS_PROD -> plantsProd = plantsProd + amount * (plus?1:-1);
-            case PLANTS -> plants = plants + amount * (plus?1:-1);
-            case TITANIUM_PROD -> titaniumProd = titaniumProd + amount * (plus?1:-1);
-            case TITANIUM -> titanium = titanium + amount * (plus?1:-1);
+            case GOLD_PROD -> {
+                goldProd = goldProd + amount * (plus?1:-1);
+                if(goldProd < 0) goldProd = 0;
+            }
+            case GOLD -> {
+                value = gold + amount * (plus?1:-1);
+                if(value < 0) return Error.MONEY;
+                gold = value;
+            }
+            case ENERGY_PROD -> {
+                energyProd = energyProd + amount * (plus?1:-1);
+                if(energyProd < 0) energyProd = 0;
+            }
+            case ENERGY -> {
+                value = energy + amount * (plus?1:-1);
+                if(value < 0) return Error.ENERGY;
+                energy = value;
+            }
+            case HEAT_PROD -> {
+                heatProd = heatProd + amount * (plus?1:-1);
+                if(heatProd < 0) heatProd = 0;
+            }
+            case HEAT -> {
+                value = heat + amount * (plus?1:-1);
+                if(value < 0) return Error.HEAT;
+                heat = value;
+            }
+            case METAL_PROD -> {
+                metalProd = metalProd + amount * (plus?1:-1);
+                if(metalProd < 0) metalProd = 0;
+            }
+            case METAL -> {
+                value = metal + amount * (plus?1:-1);
+                if(value < 0) return Error.METAL;
+                metal = value;
+            }
+            case PLANTS_PROD -> {
+                plantsProd = plantsProd + amount * (plus?1:-1);
+                if(plantsProd < 0) plantsProd = 0;
+            }
+            case PLANTS -> {
+                value = plants + amount * (plus?1:-1);
+                if(value < 0) return Error.PLANTS;
+                plants = value;
+            }
+            case TITANIUM_PROD -> {
+                titaniumProd = titaniumProd + amount * (plus?1:-1);
+                if(titaniumProd < 0) titaniumProd = 0;
+            }
+            case TITANIUM -> {
+                value = titanium + amount * (plus?1:-1);
+                if(value < 0) return Error.TITANIUM;
+                titanium = value;
+            }
         }
+        return Error.NO_ERROR;
     }
 
     public int getGoldProd() {

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Card;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.CardToSend;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.Error;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Resources;
 
 import java.util.ArrayList;
@@ -12,17 +13,69 @@ import java.util.List;
 
 public class GameDataProces {
 
+    public static Error useCard(String user, Card card, GameData gameData){
+        Resources resources = gameData.getResources().get(user);
 
+        Error error = resources.put(CardSkills.Resource.GOLD, card.getPrice(), false);
 
-    public static void useCard(String user, Card card, GameData gameData){
-        gameData.getMainCards().put(user, Long.valueOf(card.getId()));
-
-        Resources r =  gameData.getResources().get(user);
+        if(error == Error.MONEY){
+            return error;
+        }
 
         for(CardSkills cs: card.getCardSkillsList()){
             boolean plus = cs.getMove()!=CardSkills.Move.LOOSE;
-            r.put(cs.getResource(), cs.getAmount(), plus);
+            Error error1  = resources.put(cs.getResource(), cs.getAmount(), plus);
+            if(error1 != Error.NO_ERROR){
+                return error;
+            }
         }
+
+        if(card.getTypeCard() == Card.TypeCard.MAIN){
+            gameData.getMainCards().put(user, card.getId());
+        }
+        else if(card.getTypeCard() == Card.TypeCard.GREEN){
+            List<Long> list = gameData.getUsedCardGreen().get(user);
+            list.add(card.getId());
+            gameData.getUsedCardGreen().put(user, list);
+        }
+        else if(card.getTypeCard() == Card.TypeCard.BLUE){
+            List<Long> list = gameData.getUsedCardBlue().get(user);
+            list.add(card.getId());
+            gameData.getUsedCardBlue().put(user, list);
+        }
+        else if(card.getTypeCard() == Card.TypeCard.RED){
+            List<Long> list = gameData.getUsedCardRed().get(user);
+            list.add(card.getId());
+            gameData.getUsedCardRed().put(user, list);
+        }
+
+        gameData.getResources().put(user, resources);
+
+        return Error.NO_ERROR;
+    }
+
+    public static Error buyCarts(String user, List<Card> cards,int buyPrice, GameData gameData){
+        int fullPrice = cards.size() * buyPrice;
+
+        if(fullPrice > gameData.getResources().get(user).getGold()){
+            return Error.MONEY;
+        }
+
+        gameData.getResources().get(user).put(CardSkills.Resource.GOLD, fullPrice, false);
+
+        List<Long> newList = new ArrayList<>();
+
+        for(Long ids: gameData.getCards().get(user)){
+            newList.add(ids);
+        }
+
+        for(Long id: cards.stream().map(e->e.getId()).toList()){
+            newList.add(id);
+        }
+
+        gameData.getCards().put(user, newList);
+
+        return Error.NO_ERROR;
     }
 
     public static List<GameDataCheck> check(GameData gd1, GameData gd2, String username){

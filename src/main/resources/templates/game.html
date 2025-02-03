@@ -15,11 +15,12 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    
     <link rel="stylesheet" href="../../css/game.css">
 </head>
 <body>
     <header class="topbar">
-        <header th:text="${name}"></header>
+        <header th:text="${name}" id="mainPlayer"></header>
         <section>
             <section>
                 <img src="../../assets/gold.png" alt="gold icon" width="30px" height="30px"/>
@@ -47,7 +48,7 @@
                 <span id="heatR">13 [+3 /8]</span>
             </section>
         
-			<div class="endRound">Zakończ runde</div>
+			<div class="endRound" id="endRound">Zakończ runde</div>
 		</section>
     </header>
 
@@ -61,25 +62,25 @@
                     <section>
 						<span>Temp. 12&#176;</span>
 					
-                        <span class="material-symbols-outlined">
+                        <span class="material-symbols-outlined tempNot">
                      device_thermostat
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined tempNot">
                      device_thermostat
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined tempNot">
                      device_thermostat
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined tempNot">
                      device_thermostat
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined tempNot">
                      device_thermostat
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined tempNot">
                      device_thermostat
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined tempNot">
                      device_thermostat
                         </span>
 						<span class="material-symbols-outlined tempNot">
@@ -105,25 +106,25 @@
                 <section class="stat oxygenStat">
                     <section>
 					<span>Tlen 4</span>
-                        <span class="material-symbols-outlined">
+                        <span class="material-symbols-outlined oxygenStatNot">
                             spo2
                         </span>
-                    <span class="material-symbols-outlined">
+                    <span class="material-symbols-outlined oxygenStatNot">
                             spo2
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined oxygenStatNot">
                             spo2
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined oxygenStatNot">
                             spo2
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined oxygenStatNot">
                             spo2
                         </span>
-						<span class="material-symbols-outlined ">
+						<span class="material-symbols-outlined oxygenStatNot">
                             spo2
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined oxygenStatNot">
                             spo2
                         </span>
 						<span class="material-symbols-outlined oxygenStatNot">
@@ -148,13 +149,13 @@
                 <section class="stat waterStat">
                     <section>
 					<span>Oceania 4</span>
-                        <span class="material-symbols-outlined">
+                        <span class="material-symbols-outlined waterStatNot">
                             waves
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined waterStatNot">
                             waves
                         </span>
-						<span class="material-symbols-outlined">
+						<span class="material-symbols-outlined waterStatNot">
                             waves
                         </span>
 						<span class="material-symbols-outlined waterStatNot">
@@ -214,7 +215,9 @@
                 </section>
             </section>
 
- 
+            <section class="timer">
+                <span class="timerText" id="timerText">Wru: 34s</span>
+            </section>
         </nav>
 
         <main class="midPart">
@@ -234,18 +237,24 @@
                         </div>
                         <img src="../../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
                     </div>
-                   <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
                    <div>
                         <div>
                             <img src="../../assets/card.svg" alt="plants card" width="20px" height="20px"/> 
                         </div>
                         <img src="../../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
                     </div>
+                    <div>
                     <img src="../../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+                    </div>
                 </section>
 
                 <section class="row">
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div>
                     <div>
                         <div>
                             <img src="../../assets/metal.png" alt="metal icon" width="20px" height="20px"/>
@@ -253,9 +262,15 @@
                         <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
                     </div>
                     
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rectPawnBrown.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div>
+                        <div>
+                            <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                            </div>
+                            <div>
+                                <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                                </div>
                     <div>
                         <div>
                             <img src="../../assets/card.svg" alt="plants card" width="20px" height="20px"/> 
@@ -275,11 +290,21 @@
                         </div>
                         <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
                     </div>
-                    <img src="../../assets/rectPawnPink.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rectPawnBlue.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rectPawnGreen.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rectPawnRed.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div>
+                        <div>
+                            <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                            </div> 
+                            <div>
+                                <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                                </div> 
+                                <div>
+                                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                                    </div> 
+                                    <div>
+                                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                                        </div>
                     <div>
                         <div>
                             <img src="../../assets/metal.png" alt="metal card" width="20px" height="20px"/> 
@@ -289,7 +314,9 @@
                 </section>
 
                 <section class="row">
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div>
                     <div>
                         <div>
                             <img src="../../assets/plants.png" alt="plants card" width="20px" height="20px"/> 
@@ -477,11 +504,21 @@
                 
 
                 <section class="row">
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div>
+                        <div>
+                            <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                            </div>
+                            <div>
+                                <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                                </div>
+                                <div>
+                                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                                    </div>
+                                    <div>
+                                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                                        </div>
                     <div>
                         <div>
                             <img src="../../assets/plants.png" alt="plants card" width="20px" height="20px"/>  
@@ -489,7 +526,9 @@
                         <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
                     </div>
                     
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div> 
                 </section>
 
                 <section class="row">
@@ -501,7 +540,9 @@
                         <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
                     </div>
                     
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/>
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div>
                     <div>
                         <div>
                             <img src="../../assets/card.svg" alt="card icon" width="20px" height="20px"/>
@@ -516,7 +557,9 @@
                         <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
                     </div> 
                     
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div> 
                     <div>
                         <div>
                             <img src="../../assets/titanium.png" alt="titanium icon" width="20px" height="20px"/>
@@ -543,8 +586,12 @@
                         <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
                     </div>
                     
-                    <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
-                    <img src="../../assets/rectWater.svg" alt="rect" width="63px" height="73px"/> 
+                    <div>
+                        <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                        </div>
+                        <div>
+                            <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
+                            </div>
 
                     <div>
                         <div>
@@ -560,67 +607,6 @@
                     <img src="../../assets/rect.svg" alt="rect" width="63px" height="73px"/> 
                 </section>
             </section>
-
-             <section class="pasek">
-                <div class="dotsline">
-                    <div class="checked">
-                        <span>20</span>
-                    </div>
-                    <div class="greenPawn"></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked greenPawn">
-                        
-                    </div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked">
-                        <span>30</span>
-                    </div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked">
-
-                    </div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked">
-                        <span>40</span>
-                    </div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked"></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked">
-                        <span>50</span>
-                    </div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked"></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div class="checked">
-                        <span>60</span>
-                    </div>
-                   
-                </div>
-            </section> 
         </main>
 
         <nav class="rightPart">
@@ -630,28 +616,28 @@
 						<div class="playerName">Jakub</div>
 						<div class="infoPlayerContainer">
 						
-                            <section>
+                            <section class="goldOther">
                                 <img src="../../assets/gold.png" alt="gold icon" width="25px" height="25px"/>
                                 <span>127 [+17]</span>
                             </section>
-                            <section>
+                            <section class="metalOther">
                                 <img src="../../assets/metal.png" alt="metal icon" width="25px" height="25px"/>
                                 <span>13 [+3 :2]</span>
                             </section>
-                            <section>
+                            <section class="titaniumOther">
                                 <img src="../../assets/titanium.png" alt="titanium icon" width="25px" height="25px"/>
                                 <span>13 [+3 :3]</span>
                             </section>
 
-                            <section>
+                            <section class="plantsOther">
                                 <img src="../../assets/plants.png" alt="plants icon" width="25px" height="25px"/>
                                 <span>13 [+3 /3]</span>
                             </section>
-                            <section>
+                            <section class="energyOther">
                                 <img src="../../assets/energy.png" alt="energy icon" width="25px" height="25px"/>
                                 <span>13 [+3]</span>
                             </section>
-                            <section>
+                            <section class="heatOther">
                                 <img src="../../assets/heat.png" alt="heat icon" width="25px" height="25px"/>
                                 <span>13 [+3 /8]</span>
                             </section>
@@ -659,8 +645,6 @@
 						
 						</div>
 					</div>
-				
-                    
                 </div>
 				
 				<div class="infoGamerPoligon infoGamerBorder infoGamerBorderPurple">
@@ -668,64 +652,28 @@
 						<div class="playerName">Agata</div>
 						<div class="infoPlayerContainer">
 						
-                            <section>
+                            <section class="goldOther">
                                 <img src="../../assets/gold.png" alt="gold icon" width="25px" height="25px"/>
                                 <span>127 [+17]</span>
                             </section>
-                            <section>
+                            <section class="metalOther">
                                 <img src="../../assets/metal.png" alt="metal icon" width="25px" height="25px"/>
                                 <span>13 [+3 :2]</span>
                             </section>
-                            <section>
+                            <section class="titaniumOther">
                                 <img src="../../assets/titanium.png" alt="titanium icon" width="25px" height="25px"/>
                                 <span>13 [+3 :3]</span>
                             </section>
 
-                            <section>
+                            <section class="plantsOther">
                                 <img src="../../assets/plants.png" alt="plants icon" width="25px" height="25px"/>
                                 <span>13 [+3 /3]</span>
                             </section>
-                            <section>
+                            <section class="energyOther">
                                 <img src="../../assets/energy.png" alt="energy icon" width="25px" height="25px"/>
                                 <span>13 [+3]</span>
                             </section>
-                            <section>
-                                <img src="../../assets/heat.png" alt="heat icon" width="25px" height="25px"/>
-                                <span>13 [+3 /8]</span>
-                            </section>
-        
-						
-						</div>
-					</div>
-				</div>
-				
-				<div class="infoGamerPoligon infoGamerBorder infoGamerBorderRed">
-					<div class="infoGamerPoligon infoGamerInside infoGamerInsideRed">
-						<div class="playerName">Adam</div>
-						<div class="infoPlayerContainer">
-						
-                            <section>
-                                <img src="../../assets/gold.png" alt="gold icon" width="25px" height="25px"/>
-                                <span>127 [+17]</span>
-                            </section>
-                            <section>
-                                <img src="../../assets/metal.png" alt="metal icon" width="25px" height="25px"/>
-                                <span>13 [+3 :2]</span>
-                            </section>
-                            <section>
-                                <img src="../../assets/titanium.png" alt="titanium icon" width="25px" height="25px"/>
-                                <span>13 [+3 :3]</span>
-                            </section>
-
-                            <section>
-                                <img src="../../assets/plants.png" alt="plants icon" width="25px" height="25px"/>
-                                <span>13 [+3 /3]</span>
-                            </section>
-                            <section>
-                                <img src="../../assets/energy.png" alt="energy icon" width="25px" height="25px"/>
-                                <span>13 [+3]</span>
-                            </section>
-                            <section>
+                            <section class="heatOther">
                                 <img src="../../assets/heat.png" alt="heat icon" width="25px" height="25px"/>
                                 <span>13 [+3 /8]</span>
                             </section>
@@ -750,8 +698,37 @@
                 </div>
             </section>
 
+            <section class="cardsTab">
+                <section class="cardsContainerClass" id="cardsContainer">
+                </section>
+                <div class="cardOptionsToChoose">
+                    <select name="playerCard" id="selectPlayer" style="display: none;">
+                        <option value="p1">p1</option>
+                        <option value="p2">p2</option>
+                        <option value="p3">p3</option>
+                    </select>
+
+                    <span class="material-symbols-outlined" id="blueCardCheck" style="color: #00F" alt="użyte zielone karty">
+                        playing_cards
+                    </span>
+
+                    <span class="material-symbols-outlined" id="redCardCheck" style="color: #F00" alt="użyte czerwone karty">
+                        playing_cards
+                    </span>
+
+                    <span class="material-symbols-outlined" id="greenCardCheck" style="color: #0F0" alt="użyte niebieskie karty">
+                        playing_cards
+                    </span>
+
+                    <span class="material-symbols-outlined checkChoosen"  id="yourCardCheck" style="color: #FFF" alt="karty">
+                        playing_cards
+                    </span>
+
+                </div>
+            </section>
+
             <section class="sectionButtons"> 
-               <div class="poligonBorder poligonBorderWhite">
+               <div class="poligonBorder poligonBorderWhite" id="poligonPlayer">
 				   <div class="poligonBackground poligonBackgroundWhite">
 					   <span class="material-symbols-outlined">
 						diversity_3
@@ -759,7 +736,7 @@
 						<span>Gracze</span>
 					</div>
 				</div>
-               <div class="poligonBorder poligonBorderBlue">
+               <div class="poligonBorder poligonBorderBlue" id="poligonChat">
 				   <div class="poligonBackground poligonBackgroundBlue">
 					   <span class="material-symbols-outlined">
 						chat
@@ -767,6 +744,15 @@
 						<span>Chat</span>
 				   </div>
 			   </div>
+
+               <div class="poligonBorder poligonBorderBlue" id="poligonCards">
+                <div class="poligonBackground poligonBackgroundBlue">
+                    <span class="material-symbols-outlined">
+                        playing_cards
+                    </span>
+                     <span>Karty</span>
+                </div>
+            </div>
             </section>
         </nav>
     </main>

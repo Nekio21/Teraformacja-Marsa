@@ -19,6 +19,8 @@ public class Card {
 
     private TypeCard typeCard;
     //@Column(name = "image", columnDefinition="org.hibernate.type.BinaryType")
+
+    private int price;
     private byte[] image;
 
     @OneToMany(mappedBy = "card", fetch=FetchType.EAGER)
@@ -34,15 +36,24 @@ public class Card {
         this.cardSkillsList = cardSkillsList;
     }
 
+    public Card(Long id, TypeCard typeCard, int price, byte[] image, List<CardSkills> cardSkillsList) {
+        this.id = id;
+        this.typeCard = typeCard;
+        this.price = price;
+        this.image = image;
+        this.cardSkillsList = cardSkillsList;
+    }
+
     public Card(TypeCard typeCard, byte[] image, List<CardSkills> cardSkillsList) {
         this.typeCard = typeCard;
         this.image = image;
         this.cardSkillsList = cardSkillsList;
     }
 
-    public Card(TypeCard typeCard, byte[] image) {
+    public Card(TypeCard typeCard,int price, byte[] image) {
         this.typeCard = typeCard;
         this.image = image;
+        this.price = price;
     }
 
     public Long getId() {
@@ -75,5 +86,13 @@ public class Card {
 
     public void setCardSkillsList(List<CardSkills> cardSkillsList) {
         this.cardSkillsList = cardSkillsList;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 }

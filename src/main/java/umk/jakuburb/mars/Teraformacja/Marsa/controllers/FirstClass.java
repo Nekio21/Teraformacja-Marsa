@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.CardRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.PlayerQueue;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.MySession;
 
@@ -20,6 +21,9 @@ public class FirstClass {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private CardRepository cardRepository;
 
     @Autowired
     private MySession mySession;
@@ -61,11 +65,11 @@ public class FirstClass {
         String s = playerInfo.getUsername();
 
         if(mySession.getPlayerQueue() == null) {
-            PlayerQueue playerQueue = new PlayerQueue(s, rabbitAdmin, rabbitTemplate);
+            PlayerQueue playerQueue = new PlayerQueue(s,cardRepository, rabbitAdmin, rabbitTemplate);
             mySession.setPlayerQueue(playerQueue);
         }
         else if(!mySession.getPlayerQueue().getUniqName().equals(s)){
-            PlayerQueue playerQueue = new PlayerQueue(s, rabbitAdmin, rabbitTemplate);
+            PlayerQueue playerQueue = new PlayerQueue(s, cardRepository, rabbitAdmin, rabbitTemplate);
             mySession.clear();
             mySession.setPlayerQueue(playerQueue);
         }

@@ -21,4 +21,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     @Query("SELECT c FROM Card c WHERE c.id IN :ids")
     List<Card> getCards(@Param("ids")List<Long> ids);
+
+    @Query("SELECT c FROM Card c WHERE c.id = :id")
+    Card getCard(@Param("id")Long ids);
 }

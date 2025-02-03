@@ -7,7 +7,28 @@ var cards = document.getElementById("cards");
 var t;
 var r;
 
+const selectPlayer = document.getElementById("selectPlayer");
+const blueCardCheck = document.getElementById("blueCardCheck");
+const redCardCheck = document.getElementById("redCardCheck");
+const greenCardCheck = document.getElementById("greenCardCheck");
+const yourCardCheck = document.getElementById("yourCardCheck");
+var cardTypeSelect = "your";
+
+var msgTab = [];
+
 const resources = new Map();
+const levels = new Map();
+var tempWK = 0;
+var o2WK = 0;
+var oceanWK = 0;
+var gameState;
+const userStates = new Map();
+const cardUsedBlue = new Map();
+const cardUsedRed = new Map();
+const cardUsedGreen = new Map();
+const mainCard = new Map();
+var cardsTab = [];
+var namesOther = [];
 
 function startClient(){
     return new Promise((resolve, reject) => {
@@ -27,9 +48,6 @@ async function startWS(){
             var msg = JSON.parse(message.body)
 
             console.log(msg);
-
-
-
 
            if(msg.messageType == "MESSAGE_SEND"){
                 let section = document.createElement("section");
@@ -55,13 +73,10 @@ async function startWS(){
                 messageContainer.appendChild(section);
            }
            else if(msg.messageType == "CLOCK"){
-                if(msg.msg[0]=="true"){
-                    //console.log("twoj ruch: " + msg.msg[1]);
-                } else if(msg.msg[0]=="false"){
-                    //console.log("czyjs ruch: " + msg.msg[1]);
-                }
+                document.getElementById("timerText").innerHTML = msg.msg[0] + ": " + msg.msg[1] + "sec";
            }
             else if(msg.messageType == "RECOVER"){
+                msgTab[msg.recoverType] = msg
                 if(msg.recoverType == "CHAT"){
 
                     messageContainer.innerHTML = "";
@@ -91,18 +106,62 @@ async function startWS(){
                     }
 
                 }
-				else if(msg.recoverType == "PLAYERS"){}
-				else if(msg.recoverType == "MAIN_CARD"){}
-				else if(msg.recoverType == "USED_CARDS_BLUE"){}
+				else if(msg.recoverType == "PLAYERS"){
+                    
+                    let x = 0;
+
+                    for(let i=0;i<msg.msg.length;i++){
+                        if(msg.msg[i] != playerName){
+                            namesOther[x] = msg.msg[i];
+                            x++;
+                        }
+                    }
+
+                    updatePlayers()
+                }
+				else if(msg.recoverType == "MAIN_CARD"){
+                    for(let i=0;i<msg.owners.length;i++){
+                        mainCard.set(msg.owners[i], msg.cards[i]);
+                    }
+                    updateMainCard();
+                }
+				else if(msg.recoverType == "USED_CARDS_BLUE"){
+                    
+                }
 				else if(msg.recoverType == "USED_CARDS_RED"){}
 				else if(msg.recoverType == "USED_CARDS_GREEN"){}
-				else if(msg.recoverType == "CARD"){}
+				else if(msg.recoverType == "CARD"){
+                    for(let i=0;i<msg.owners.length;i++){
+                        if(msg.owners[i] == playerName){
+                            cardsTab = msg.cardsList[i];
+                        }
+                    }
+
+                    updateCardConstainer();
+                }
 				else if(msg.recoverType == "RESOURCES"){
+                    console.log(msg.resources)
+				    r = msg.resources
+				
+				    for(let i=0;i<msg.owners.length;i++){
+					    resources.set(msg.owners[i], msg.resources[i])
+				    }
+                    
 					resourceInput()
 				}
-				else if(msg.recoverType == "PLANET"){console.log(msg)}
-				else if(msg.recoverType == "LEVEL"){console.log(msg)}
-				else if(msg.recoverType == "OTHERS"){console.log(msg)}
+				else if(msg.recoverType == "PLANET"){
+                    console.log(msg)
+                    makePlanet(msg.msg);
+                }
+				else if(msg.recoverType == "LEVEL"){
+                    console.log(msg)
+                    makeLevels(msg.dataLong, msg.owners)
+                    useLevels(msg.owners)
+                }
+				else if(msg.recoverType == "OTHERS"){
+                    console.log(msg)
+
+                }
             }
             else if(msg.messageType == "GAME_STATE"){
                 if(msg.msg[0] == "WAITING"){
@@ -128,7 +187,7 @@ async function startWS(){
 
                 cards.appendChild(img);
             }
-            else if(msg.messageType == "CARDS10"){
+            else if(msg.messageType == "CARDS10" || msg.messageType == "CARDS"){
                 cards.innerHTML = "";
 
 				let div = document.createElement("div");
@@ -170,10 +229,13 @@ async function startWS(){
 					
 					let gold = resources.get(playerName).gold - imgs.length*3
 					if(gold < 0){
-					
+                        alert("za malo pieniedzy");
 					}
 					else{
-						sendToServer("CARDS10", ids)
+						sendToServer(msg.messageType, ids)
+                        main.style.display = 'flex';
+					    cards.style.display = 'none';
+                        document.getElementById("timerText").innerHTML = "Prosze Czekać :)"
 					}
 				});
 				
@@ -191,13 +253,29 @@ async function startWS(){
 				
 				resourceInput()
 			}
-			else if(msg.messageType == "USER_STATE"){
-				if(msg.msg[0] == "WAITING"){
-					console.log('wait')
-				}
-			}
             else if(msg.messageType == "CARDS"){
-                console.log("cards " + msg)
+                for(let i=0;i<msg.cards.length; i++){
+                    cardsTab.push(msg.cards[i])
+                }
+            }
+            else if(msg.messageType == "USER_STATE"){
+                for(let i=0;i<msg.owners.length;i++){
+                    userStates.set(msg.owners[i], msg.msg[i]);
+                }
+
+                
+                useLevels(msg.owners)
+
+                if(msg.msg[0] == "CHOSE_CARD"){
+					main.style.display = 'none';
+					cards.style.display = 'flex';
+				}
+                
+                if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+                    document.getElementById("endRound").classList.add("endRoundActive");
+                }else{
+                    document.getElementById("endRound").classList.remove("endRoundActive");  
+                }
             }
 //			else if(msg.messageType == "CARDS10"){
 //				alert("karty są :)");
@@ -252,4 +330,199 @@ function resourceInput(){
 	document.getElementById('plantsR').innerHTML = r.plants + "[+" + r.plantsProd + "]";
 	document.getElementById('energyR').innerHTML = r.energy + "[+" + r.energyProd + "]";
 	document.getElementById('heatR').innerHTML = r.heat + "[+" + r.heatProd + "]";
+
+    for(let i=0;i<namesOther.length;i++){
+        let r = resources.get(namesOther[i])
+        let sections = document.getElementById("playerName" + namesOther[i]).parentElement.getElementsByClassName("infoPlayerContainer")[0].getElementsByTagName("section");
+
+        sections[0].getElementsByTagName("span")[0].innerHTML = r.gold + "[+" + r.goldProd + "]";
+        sections[1].getElementsByTagName("span")[0].innerHTML = r.metal + "[+" + r.metalProd + "]";
+        sections[2].getElementsByTagName("span")[0].innerHTML = r.titanium + "[+" + r.titaniumProd + "]";
+        sections[3].getElementsByTagName("span")[0].innerHTML = r.plants + "[+" + r.plantsProd + "]";
+        sections[4].getElementsByTagName("span")[0].innerHTML = r.energy + "[+" + r.energyProd + "]";
+        sections[5].getElementsByTagName("span")[0].innerHTML = r.heat + "[+" + r.heatProd + "]";
+    }
+}
+
+function updatePlayers(){
+    
+    let options = selectPlayer.getElementsByTagName("option");
+    options[0].innerHTML =  playerName;
+    options[0].value =  playerName;
+
+    let playerNameDiv = document.getElementsByClassName('playerName');
+
+    for(let i=0;i<playerNameDiv.length;i++){
+        playerNameDiv[i].innerHTML = namesOther[i];
+        playerNameDiv[i].id = "playerName" + namesOther[i];
+        options[i+1].innerHTML = namesOther[i];
+        options[i+1].value = namesOther[i];
+    }
+}
+
+function makePlanet(tab){
+    let rows = document.getElementsByClassName("row");
+    let w=0;
+
+    for(let x=0;x<rows.length;x++){
+        let divs = rows[x].getElementsByTagName('div');
+        for(let y=0;y<divs.length;y++){
+            divs[y].innerHTML = "";
+            let img = document.createElement("img");
+            img.style.width = "63px";
+            img.style.height = "73px";
+            
+            if(tab[w]=="NOTHING"){
+                img.src = "../../assets/rect.svg";
+            }
+            else if(tab[w]=="NO_OCEAN"){
+                img.src = "../../assets/rectWater.svg";
+            }
+
+            divs[y].appendChild(img);
+            w++;
+        }
+    }
+}
+
+function makeLevels(level, owners){
+    for(let i=0;i<level.length;i++){
+        levels.set(owners[i], level[i]);
+    }
+}
+
+function useLevels(owners){
+    for(let i=0;i<owners.length;i++){
+        if(owners[i] == playerName){
+            let text = playerName;
+            document.getElementById("mainPlayer").innerHTML = text + " [" + levels.get(owners[i]) + "]" + " [" + userStates.get(owners[i]) +"]";
+        }else{
+            let text = owners[i];
+            document.getElementById("playerName" + owners[i]).innerHTML = text + " [" + levels.get(owners[i]) + "]" + " [" + userStates.get(owners[i]) +"]";
+        }
+    }
+}
+
+
+function updateMainCard(){
+
+}
+
+function updateCard(){
+
+}
+
+document.getElementById("poligonPlayer").addEventListener("click", function(){
+    document.getElementsByClassName("playersTab")[0].style.display = "flex";
+    document.getElementsByClassName("playersMessage")[0].style.display = "none";
+    document.getElementsByClassName("cardsTab")[0].style.display = "none";
+});
+
+document.getElementById("poligonChat").addEventListener("click", function(){
+    document.getElementsByClassName("playersTab")[0].style.display = "none";
+    document.getElementsByClassName("playersMessage")[0].style.display = "flex";
+    document.getElementsByClassName("cardsTab")[0].style.display = "none";
+});
+
+document.getElementById("poligonCards").addEventListener("click", function(){
+    document.getElementsByClassName("playersTab")[0].style.display = "none";
+    document.getElementsByClassName("playersMessage")[0].style.display = "none";
+    document.getElementsByClassName("cardsTab")[0].style.display = "flex";
+});
+
+selectPlayer.addEventListener("change", function(){
+    updateCardConstainer(selectPlayer.value)
+});
+
+updateCardConstainer(playerName)
+
+blueCardCheck.addEventListener("click", function(){
+    blueCardCheck.classList.add("checkChoosen");
+    redCardCheck.classList.remove("checkChoosen");
+    greenCardCheck.classList.remove("checkChoosen");
+    yourCardCheck.classList.remove("checkChoosen");
+    selectPlayer.style.display = "inline";
+    cardTypeSelect = "blue";
+    updateCardConstainer()
+});
+
+redCardCheck.addEventListener("click", function(){
+    blueCardCheck.classList.remove("checkChoosen");
+    redCardCheck.classList.add("checkChoosen");
+    greenCardCheck.classList.remove("checkChoosen");
+    yourCardCheck.classList.remove("checkChoosen");
+    selectPlayer.style.display = "inline";
+    cardTypeSelect = "red";
+    updateCardConstainer()
+});
+
+greenCardCheck.addEventListener("click", function(){
+    blueCardCheck.classList.remove("checkChoosen");
+    redCardCheck.classList.remove("checkChoosen");
+    greenCardCheck.classList.add("checkChoosen");
+    yourCardCheck.classList.remove("checkChoosen");
+    cardTypeSelect = "green";
+    selectPlayer.style.display = "inline";
+    updateCardConstainer()
+});
+
+yourCardCheck.addEventListener("click", function(){
+    blueCardCheck.classList.remove("checkChoosen");
+    redCardCheck.classList.remove("checkChoosen");
+    greenCardCheck.classList.remove("checkChoosen");
+    yourCardCheck.classList.add("checkChoosen");
+    selectPlayer.style.display = "none";
+    cardTypeSelect = "your";
+    updateCardConstainer();
+});
+
+document.getElementById("endRound").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("NEXT_ROUND",[playerName])
+    }
+});
+
+function updateCardConstainer(){
+    let value = selectPlayer.value;
+    let cardsContainer = document.getElementById("cardsContainer");
+    cardsContainer.innerHTML = "";
+
+    if(cardTypeSelect == "your"){
+        for(let i=0;i<cardsTab.length;i++){
+            let img = document.createElement("img");
+            img.src = "data:image/png;base64," + cardsTab[i].image;
+            img.addEventListener("dblclick", function(){
+                sendToServer("USE_CARD", [cardsTab[i].index])
+            });
+
+            cardsContainer.appendChild(img);
+        }
+    }
+    else if(cardTypeSelect == "green"){
+        for(let i=0;i<cardUsedGreen.get(value).length;i++){
+            let img = document.createElement("img");
+            img.src = "data:image/png;base64," + cardUsedGreen.get(value)[i].image;
+        
+
+            cardsContainer.appendChild(img);
+        }
+    }
+    else if(cardTypeSelect == "red"){
+        for(let i=0;i<cardUsedRed.get(value).length;i++){
+            let img = document.createElement("img");
+            img.src = "data:image/png;base64," + cardUsedRed.get(value)[i].image;
+            
+
+            cardsContainer.appendChild(img);
+        }
+    }
+    else if(cardTypeSelect == "blue"){
+        for(let i=0;i<cardUsedBlue.get(value).length;i++){
+            let img = document.createElement("img");
+            img.src = "data:image/png;base64," + cardUsedBlue.get(value)[i].image;
+    
+
+            cardsContainer.appendChild(img);
+        }
+    }
 }

@@ -2,12 +2,17 @@ package umk.jakuburb.mars.Teraformacja.Marsa.rabbit;
 
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Card;
+import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.CardRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.*;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameData;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataCheck;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataProces;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static umk.jakuburb.mars.Teraformacja.Marsa.message.CardToSend.makeListCardToSend;
 
 public class PlayerQueue extends CoreQueue{
 
@@ -17,8 +22,12 @@ public class PlayerQueue extends CoreQueue{
 
     //TODO: java.net.SocketException: An established connection was aborted by the software in your host machine
 
-    public PlayerQueue(String uniqName, RabbitAdmin rabbitAdmin, RabbitTemplate rabbitTemplate){
+    private CardRepository cardRepository;
+
+    public PlayerQueue(String uniqName,CardRepository cardRepository, RabbitAdmin rabbitAdmin, RabbitTemplate rabbitTemplate){
         super(uniqName, rabbitAdmin, rabbitTemplate);
+
+        this.cardRepository = cardRepository;
 
         addSendFunction(MessageType.USER_IN, this::sendIAmIn);
         addSendFunction(MessageType.USER_OUT, this::sendIAmOut);
@@ -47,6 +56,11 @@ public class PlayerQueue extends CoreQueue{
 
         addReceiveFunction(MessageType.RESOURCES, this::save);
         addReceiveFunction(MessageType.CARDS, this::save);
+
+        addSendFunction(MessageType.USE_CARD, this::sendToGame);
+        addSendFunction(MessageType.NEXT_ROUND, this::sendToGame);
+
+        gameData.getCards().put(uniqName, new ArrayList<>());
     }
 
     private void mainCardSend(MyMessage msg){
@@ -124,28 +138,50 @@ public class PlayerQueue extends CoreQueue{
                     this.gameData.setChat(gameData.getChat());
                 }
                 case MAIN_CARD -> {
+                    List<Long> ids = gameData.getPlayers().stream().map(e->gameData.getMainCards().get(e)).toList();
+
                     msgToSend.setOwners(gameData.getPlayers());
-                    msgToSend.setDataLong(gameData.getPlayers().stream().map(e->gameData.getMainCards().get(e)).toList());
+                    msgToSend.setDataLong(ids);
+                    msgToSend.setCards(CardToSend.makeCardToSend(cardRepository.getCards(ids)));
                     this.gameData.setMainCards(gameData.getMainCards());
                 }
                 case USED_CARDS_BLUE -> {
+                    List<List<Long>> ids = gameData.getPlayers().stream().map(e->gameData.getUsedCardBlue().get(e)).toList();
+                    List<List<Card>> cards = gameData.getPlayers().stream().map(e->cardRepository.getCards(gameData.getUsedCardBlue().get(e))).toList();
+
                     msgToSend.setOwners(gameData.getPlayers());
-                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getUsedCardBlue().get(e)).toList());
+                    msgToSend.setDataListLong(ids);
+                    msgToSend.setListCards(makeListCardToSend(cards));
                     this.gameData.setUsedCardBlue(gameData.getUsedCardBlue());
                 }
                 case USED_CARDS_RED ->{
+                    List<List<Long>> ids = gameData.getPlayers().stream().map(e->gameData.getUsedCardRed().get(e)).toList();
+                    List<List<Card>> cards = gameData.getPlayers().stream().map(e->cardRepository.getCards(gameData.getUsedCardRed().get(e))).toList();
+
+
                     msgToSend.setOwners(gameData.getPlayers());
-                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getUsedCardRed().get(e)).toList());
+                    msgToSend.setDataListLong(ids);
+                    msgToSend.setListCards(makeListCardToSend(cards));
                     this.gameData.setUsedCardRed(gameData.getUsedCardRed());
                 }
                 case USED_CARDS_GREEN ->{
+                    List<List<Long>> ids = gameData.getPlayers().stream().map(e->gameData.getUsedCardGreen().get(e)).toList();
+                    List<List<Card>> cards = gameData.getPlayers().stream().map(e->cardRepository.getCards(gameData.getUsedCardGreen().get(e))).toList();
+
+
                     msgToSend.setOwners(gameData.getPlayers());
-                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getUsedCardGreen().get(e)).toList());
+                    msgToSend.setDataListLong(ids);
+                    msgToSend.setListCards(makeListCardToSend(cards));
                     this.gameData.setUsedCardGreen(gameData.getUsedCardGreen());
                 }
                 case CARD ->{
+                    List<List<Long>> ids = gameData.getPlayers().stream().map(e->gameData.getCards().get(e)).toList();
+                    List<List<Card>> cards = gameData.getPlayers().stream().map(e->cardRepository.getCards(gameData.getCards().get(e))).toList();
+
+
                     msgToSend.setOwners(gameData.getPlayers());
-                    msgToSend.setDataListLong(gameData.getPlayers().stream().map(e->gameData.getCards().get(e)).toList());
+                    msgToSend.setDataListLong(ids);
+                    msgToSend.setListCards(makeListCardToSend(cards));
                     this.gameData.setCards(gameData.getCards());
                 }
                 case RESOURCES ->{
@@ -236,15 +272,10 @@ public class PlayerQueue extends CoreQueue{
         MyMessage myMessage = new MyMessage();
         myMessage.setFrom("You");
         myMessage.setMessageType(MessageType.CLOCK);
-
-        if(message.getMsg().get(0).equals(uniqName)){
-            myMessage.setMsg(List.of("true", message.getMsg().get(1)));
-        }else{
-            myMessage.setMsg(List.of("false", message.getMsg().get(1)));
-        }
+        myMessage.setMsg(List.of(message.getMsg().get(0), message.getMsg().get(1)));
 
         //return myMessage;
-        return null;
+        return myMessage;
     }
 
     private MyMessage save(MyMessage msg){
@@ -284,6 +315,7 @@ public class PlayerQueue extends CoreQueue{
 
     private void sendToGame(MyMessage m){
         m.setFrom(uniqName);
+        m.setAbout(uniqName);
         rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE), "help", m);
     }
 }

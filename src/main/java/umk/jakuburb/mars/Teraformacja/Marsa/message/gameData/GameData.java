@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Area;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.ChatRecord;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Resources;
+import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.GameCoreQueue;
 
 import java.io.Serializable;
 import java.util.*;
@@ -43,6 +44,9 @@ public class GameData implements Serializable {
     @JsonProperty("levels")
     private HashMap<String, Long> level;
 
+    @JsonProperty("usersState")
+    private HashMap<String, GameCoreQueue.UserState> usersState;
+
     @JsonProperty("temp")
     private int temp;
     @JsonProperty("co2")
@@ -60,6 +64,7 @@ public class GameData implements Serializable {
         usedCardBlue = new HashMap<>();
         usedCardGreen = new HashMap<>();
         resources = new HashMap<>();
+        usersState = new HashMap<>();
         level = new HashMap<>();
         planet = new ArrayList<>();
 
@@ -179,5 +184,13 @@ public class GameData implements Serializable {
 
     public void setOcean(int ocean) {
         this.ocean = ocean;
+    }
+
+    public HashMap<String, GameCoreQueue.UserState> getUsersState() {
+        return usersState;
+    }
+
+    public void setUsersState(HashMap<String, GameCoreQueue.UserState> usersState) {
+        this.usersState = usersState;
     }
 }

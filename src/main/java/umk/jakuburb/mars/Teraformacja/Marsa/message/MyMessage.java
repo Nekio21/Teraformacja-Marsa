@@ -43,6 +43,9 @@ public class MyMessage implements Serializable {
     @JsonProperty("cards")
     private List<CardToSend> cards;
 
+    @JsonProperty("cardsList")
+    private List<List<CardToSend>> listCards;
+
     @JsonProperty("resources")
     private List<Resources> resources;
 
@@ -204,5 +207,13 @@ public class MyMessage implements Serializable {
 
     public List<List<Long>> getDataListLong() {
         return dataListLong;
+    }
+
+    public List<List<CardToSend>> getListCards() {
+        return listCards;
+    }
+
+    public void setListCards(List<List<CardToSend>> listCards) {
+        this.listCards = listCards;
     }
 }

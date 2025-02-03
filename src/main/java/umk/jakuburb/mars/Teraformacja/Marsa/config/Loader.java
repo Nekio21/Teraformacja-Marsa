@@ -61,25 +61,25 @@ public class Loader implements ApplicationRunner {
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.GOLD, 7)
         ));
 
-        saveCard("card1.png", Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card2.png", Card.TypeCard.GREEN, new ArrayList<>());
-        saveCard("card3.png", Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card4.png", Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card5.png", Card.TypeCard.RED, new ArrayList<>());
-        saveCard("card6.png", Card.TypeCard.RED, new ArrayList<>());
-        saveCard("card7.png", Card.TypeCard.GREEN, new ArrayList<>());
-        saveCard("card8.png", Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card9.svg", Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card10.png", Card.TypeCard.BLUE, new ArrayList<>());
+        saveCard("card1.png",31, Card.TypeCard.BLUE, new ArrayList<>());
+        saveCard("card2.png", 13,Card.TypeCard.GREEN, new ArrayList<>());
+        saveCard("card3.png", 15,Card.TypeCard.BLUE, new ArrayList<>());
+        saveCard("card4.png", 12,Card.TypeCard.BLUE, new ArrayList<>());
+        saveCard("card5.png", 43,Card.TypeCard.RED, new ArrayList<>());
+        saveCard("card6.png", 12,Card.TypeCard.RED, new ArrayList<>());
+        saveCard("card7.png", 31,Card.TypeCard.GREEN, new ArrayList<>());
+        saveCard("card8.png", 11,Card.TypeCard.BLUE, new ArrayList<>());
+        saveCard("card9.svg", 3,Card.TypeCard.BLUE, new ArrayList<>());
+        saveCard("card10.png", 4,Card.TypeCard.BLUE, new ArrayList<>());
     }
 
     private void saveMainCard(String name, List<CardSkills> list) throws IOException {
-        saveCard("main/" + name, Card.TypeCard.MAIN, list);
+        saveCard("main/" + name, 0, Card.TypeCard.MAIN, list);
     }
 
-    private void saveCard(String name, Card.TypeCard typeCard, List<CardSkills> list) throws IOException{
+    private void saveCard(String name, int price, Card.TypeCard typeCard, List<CardSkills> list) throws IOException{
         File file = new ClassPathResource("static/assets/cards/" + name).getFile();
-        Card card = new Card(typeCard, Files.readAllBytes(file.toPath()));
+        Card card = new Card(typeCard,price, Files.readAllBytes(file.toPath()));
         cardRepository.save(card);
 
         for(CardSkills cardSkills: list){

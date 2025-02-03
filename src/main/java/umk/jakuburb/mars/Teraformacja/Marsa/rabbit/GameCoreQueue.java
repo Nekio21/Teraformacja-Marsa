@@ -38,7 +38,7 @@ public abstract class GameCoreQueue {
         NO_MOVE,
         FIRST_MOVE,
         SECOND_MOVE,
-
+        PASS,
     }
 
     public GameCoreQueue(
