@@ -87,7 +87,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             gameDate.getUsedCardBlue().put(player, new ArrayList<>());
             gameDate.getUsedCardRed().put(player, new ArrayList<>());
             gameDate.getUsedCardGreen().put(player, new ArrayList<>());
-            gameDate.getLevel().put(player, 0L);
+            gameDate.getLevel().put(player, 23L);
 
             gameDate.getUsersState().put(player, UserState.WAITING);
         }
@@ -103,13 +103,11 @@ public class GameQueue extends GameCoreQueue implements Timerable {
                 NOTHING, NOTHING, NOTHING,NOTHING,NOTHING, NOTHING,
                 NOTHING, NOTHING, NOTHING,NO_OCEAN,NOTHING
         ));
+
+        cardsToChose.clear();
     }
 
     private void card10Receive(MyMessage msg){
-        //List<CardToSend> carts = msg.getCards();
-
-        //List<Long> ids = carts.stream().map(CardToSend::getIndex).toList();
-
         if(gameDate.getUsersState().get(msg.getFrom()) != UserState.CHOSE_CARD) return;
 
         List<Long> ids = msg.getMsg().stream().map(Long::valueOf).toList();
@@ -121,22 +119,22 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             sendErrorMessage(from, Error.MONEY);
         }
 
-        //if(Arrays.deepEquals(ids.toArray(), cardsToChose.get(from).toArray())){
         if(cardsToChose.get(from).containsAll(ids)){
-            gameDate.getCards().put(from, ids);
-//            msg.setMessageType(CARDS10_SAVE);
-//            msg.setAbout(msg.getFrom());
-//            sendToUser(msg);
-
             List<Card> list = cardRepository.getCards(ids);
-            GameDataProces.buyCarts(from, list,price, gameDate);
+            Error err = GameDataProces.buyCarts(from, list,price, gameDate);
+
+            if(err != Error.NO_ERROR){
+                sendErrorMessage(from, err);
+                return;
+            }
 
             sendCards(from, ids);
             sendResources(from);
+
             gameDate.getUsersState().put(from, UserState.WAITING);
 
             if(gameDate.getUsersState().values().stream().allMatch(e->e==UserState.WAITING)){
-                startGame();
+                startRound();
             }else{
                 sendStates();
             }
@@ -145,7 +143,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         }
     }
 
-    private void startGame(){
+    private void startRound(){
         gameState = GameState.ROUND;
         sendGameState();
 
@@ -154,19 +152,21 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             recover(new MyMessage(List.of(p)));
         }
 
-        gameDate.getUsersState().put(gameDate.getPlayers().get(0), UserState.FIRST_MOVE);
-        whoPlay = 0;
+        whoPlay = (whoPlay+1) % gameDate.getPlayers().size();
+        gameDate.getUsersState().put(gameDate.getPlayers().get(whoPlay), UserState.FIRST_MOVE);
         sendStates();
     }
 
     private void endRound(){
         gameState= GameState.AFTER_ROUND;
         gameDate.getPlayers().forEach(e->{
-            gameDate.getResources().get(e).fill();
+            gameDate.getResources().get(e).fill(Math.toIntExact(gameDate.getLevel().get(e)));
             sendResources(e);
         });
 
         gameState= GameState.BEFORE_ROUND;
+        gameDate.setRound(gameDate.getRound()+1);
+        cardsToChose.clear();
         gameDate.getPlayers().forEach(e->{
             takeCard(e, false, 2);
         });
@@ -196,6 +196,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
     }
 
     public Error useCardCAS(MyMessage msg){
+        String about = msg.getAbout();
 
         if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
             return Error.NO_YOUR_MOVE;
@@ -204,16 +205,29 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         msg.setAbout(msg.getFrom());
         List<Card> list = cardRepository.getCards(List.of(Long.valueOf(msg.getMsg().get(0))));
 
-        Error error = useCard(msg.getAbout(), list.get(0), gameDate);
+        Error error = useCard(about, list.get(0), gameDate);
 
-        if(gameDate.getUsersState().get(msg.getAbout()) == UserState.FIRST_MOVE){
-            gameDate.getUsersState().put(msg.getAbout(), UserState.SECOND_MOVE);
+        if(error != Error.NO_ERROR){
+            return error;
+        }
+
+        gameDate.getCards().get(msg.getAbout()).removeIf(e->e.equals(Long.valueOf(msg.getMsg().get(0))));
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
         }
         else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
-            gameDate.getUsersState().put(msg.getAbout(), UserState.NO_MOVE);
+            nextRoundCAS(msg);
         }
 
-        return error;
+        msg.setCards(List.of(new CardToSend(list.get(0))));
+
+        sendStates();
+        sendResources(about);
+        sendOthers(about);
+        sendLevel(about);
+
+        return Error.NO_ERROR;
     }
 
     private void nextPlayer(){
@@ -239,15 +253,15 @@ public class GameQueue extends GameCoreQueue implements Timerable {
     }
 
     public void mainCard(MyMessage message){
-        if(Long.valueOf(message.getMsg().get(0)).equals(mainCardToChose.get(message.getFrom()))){
+        if(gameDate.getUsersState().get(message.getAbout()) == UserState.CHOSE_MAIN_CARD && Long.valueOf(message.getMsg().get(0)).equals(mainCardToChose.get(message.getFrom()))){
             String from = message.getFrom();
 
             Card card = cardRepository.getCard(Long.valueOf(message.getMsg().get(0)));
             gameDate.getMainCards().put(from, Long.valueOf(message.getMsg().get(0)));
-            //gameDate
-            //TODO: niech karta glowna zmieni resources
 
             GameDataProces.useCard(from, card, gameDate);
+
+            gameDate.getUsersState().put(message.getAbout(), UserState.CHOSE_CARD);
 
             message.setMsg(List.of(from));
             message.setMessageType(MessageType.MAIN_CARDS_SAVE);
@@ -255,6 +269,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
             sendToUsers(message);
             sendResources(from);
+            sendOthers(from);
             sendStates();
             sendCards10(message);
         } else{
@@ -292,6 +307,32 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         sendToUsers(myMessage);
     }
 
+    private void sendLevel(String user){
+        MyMessage myMessage = new MyMessage();
+        myMessage.setFrom(NAME);
+        myMessage.setAbout(user);
+        myMessage.setMessageType(MessageType.LEVELS);
+        myMessage.setOwners(gameDate.getPlayers());
+        myMessage.setDataLong(gameDate.getPlayers().stream().map(e->gameDate.getLevel().get(e)).toList());
+
+        sendToUsers(myMessage);
+    }
+
+    private void sendOthers(String user){
+        MyMessage myMessage = new MyMessage();
+        myMessage.setFrom(NAME);
+        myMessage.setAbout(user);
+        myMessage.setMessageType(MessageType.OTHERS);
+        myMessage.setMsg(List.of(
+                gameDate.getRound(),
+                gameDate.getWinningPoints().getWinTemp(), gameDate.getWinningPoints().getTemp(),
+                gameDate.getWinningPoints().getWinOxygen(), gameDate.getWinningPoints().getOxygen(),
+                gameDate.getWinningPoints().getWinOcean(), gameDate.getWinningPoints().getOcean()
+        ).stream().map(String::valueOf).toList());
+
+        sendToUsers(myMessage);
+    }
+
     private void sendCards(String user, List<Long> cardToSends){
         List<Card> cards = cardRepository.getCards(cardToSends);
 
@@ -317,13 +358,14 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         }
 
         drawCards.addAll(cardsList.stream().map(Card::getId).toList());
+
         cardsToChose.put(user,cardsList.stream().map(Card::getId).toList());
 
         List<CardToSend> cardToSends = cardsList.stream().map(c->new CardToSend(c.getId(), c.getTypeCard(), c.getImage())).toList();
 
         MyMessage myMessage = new MyMessage();
         myMessage.setCards(cardToSends);
-        myMessage.setMessageType(cards10 ? MessageType.CARDS10: CARDS);
+        myMessage.setMessageType(MessageType.CARDS10);
         myMessage.setFrom(user);
         myMessage.setAbout(user);
 

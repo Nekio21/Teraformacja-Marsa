@@ -2,6 +2,7 @@ package umk.jakuburb.mars.Teraformacja.Marsa.message;
 
 public enum Error {
     NO_MORE_CARD, DEFAULT, NO_ERROR, MONEY, NO_YOUR_MOVE,
-    ENERGY, HEAT,METAL,PLANTS,TITANIUM
+    ENERGY, HEAT,METAL,PLANTS,TITANIUM,
+    TEMP, OXYGEN, OCEAN
 
 }

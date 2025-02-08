@@ -21,7 +21,9 @@ public class CardSkills {
         FOREST,
         OCEAN,
         TEMP,
-        OXYGEN
+        OXYGEN,
+        CARD,
+        PZ
     }
 
     @Id

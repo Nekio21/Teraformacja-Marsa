@@ -1,20 +1,23 @@
 package umk.jakuburb.mars.Teraformacja.Marsa.message.gameData;
 
-import org.springframework.stereotype.Component;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Card;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills;
-import umk.jakuburb.mars.Teraformacja.Marsa.message.CardToSend;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Error;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Resources;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.WinningPoints;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills.Resource.PZ;
 
 public class GameDataProces {
 
     public static Error useCard(String user, Card card, GameData gameData){
         Resources resources = gameData.getResources().get(user);
+        WinningPoints winningPoints = gameData.getWinningPoints();
 
         Error error = resources.put(CardSkills.Resource.GOLD, card.getPrice(), false);
 
@@ -22,10 +25,19 @@ public class GameDataProces {
             return error;
         }
 
+        AtomicInteger pz = new AtomicInteger();
+        pz.set(0);
+
         for(CardSkills cs: card.getCardSkillsList()){
             boolean plus = cs.getMove()!=CardSkills.Move.LOOSE;
-            Error error1  = resources.put(cs.getResource(), cs.getAmount(), plus);
-            if(error1 != Error.NO_ERROR){
+            Error error1 = resources.put(cs.getResource(), cs.getAmount(), plus);
+            Error error2 = winningPoints.put(cs.getResource(), cs.getAmount(), plus, pz);
+
+            if(cs.getResource() == PZ){
+                pz.set(pz.get() + 1);
+            }
+
+            if(error1 != Error.NO_ERROR && error2 != Error.NO_ERROR){
                 return error;
             }
         }
@@ -50,6 +62,8 @@ public class GameDataProces {
         }
 
         gameData.getResources().put(user, resources);
+        gameData.setWinningPoints(winningPoints);
+        gameData.getLevel().put(user, gameData.getLevel().get(user) + pz.get());
 
         return Error.NO_ERROR;
     }
@@ -77,7 +91,6 @@ public class GameDataProces {
 
         return Error.NO_ERROR;
     }
-
     public static List<GameDataCheck> check(GameData gd1, GameData gd2, String username){
         List<GameDataCheck> list = new ArrayList<>();
 
@@ -157,12 +170,12 @@ public class GameDataProces {
             list.add(GameDataCheck.LEVEL);
         }
 
-        if(!(gd1.getRound() == gd2.getRound() && gd1.getCo2() == gd2.getCo2() && gd1.getTemp() == gd2.getTemp() && gd1.getOcean() == gd2.getOcean())){
+        if(!(gd1.getRound() == gd2.getRound() && gd1.getWinningPoints() == gd2.getWinningPoints())){
             list.add(GameDataCheck.OTHERS);
         }
 
         return list;
     }
 
-
+    
 }

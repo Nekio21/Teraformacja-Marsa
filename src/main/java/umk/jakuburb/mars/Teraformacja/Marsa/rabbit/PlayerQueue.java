@@ -49,7 +49,7 @@ public class PlayerQueue extends CoreQueue{
         addReceiveFunction(MessageType.CLOCK, this::clock);
         addReceiveFunction(MessageType.RECOVER, this::recover);
 
-        addSendFunction(MessageType.MAIN_CARDS, this::mainCardSend);
+        addSendFunction(MessageType.MAIN_CARDS, this::sendToGame);
         addReceiveFunction(MessageType.MAIN_CARDS_SAVE, this::save);
         //addSendFunction(MessageType.RECOVER, this::recoverSend);
         addSendFunction(MessageType.CARDS10, this::sendToGame);
@@ -60,12 +60,10 @@ public class PlayerQueue extends CoreQueue{
         addSendFunction(MessageType.USE_CARD, this::sendToGame);
         addSendFunction(MessageType.NEXT_ROUND, this::sendToGame);
 
-        gameData.getCards().put(uniqName, new ArrayList<>());
-    }
+        addReceiveFunction(MessageType.USE_CARD, this::save);
+        addReceiveFunction(MessageType.OTHERS, this::save);
 
-    private void mainCardSend(MyMessage msg){
-        msg.setFrom(uniqName);
-        rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),"help", msg);
+        gameData.getCards().put(uniqName, new ArrayList<>());
     }
 
     private void messageSend(MyMessage send){
@@ -115,6 +113,8 @@ public class PlayerQueue extends CoreQueue{
 
         rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),"help", msg);
     }
+
+
 
     private MyMessage recover(MyMessage msg){
         GameData gameData = msg.getGameData();
@@ -178,7 +178,6 @@ public class PlayerQueue extends CoreQueue{
                     List<List<Long>> ids = gameData.getPlayers().stream().map(e->gameData.getCards().get(e)).toList();
                     List<List<Card>> cards = gameData.getPlayers().stream().map(e->cardRepository.getCards(gameData.getCards().get(e))).toList();
 
-
                     msgToSend.setOwners(gameData.getPlayers());
                     msgToSend.setDataListLong(ids);
                     msgToSend.setListCards(makeListCardToSend(cards));
@@ -200,11 +199,14 @@ public class PlayerQueue extends CoreQueue{
                     this.gameData.setLevel(gameData.getLevel());
                 }
                 case OTHERS ->{
-                    msgToSend.setMsg(List.of(gameData.getRound(), gameData.getTemp(), gameData.getCo2(), gameData.getOcean()).stream().map(String::valueOf).toList());
+                    msgToSend.setMsg(List.of(
+                            gameData.getRound(),
+                            gameData.getWinningPoints().getWinTemp(), gameData.getWinningPoints().getTemp(),
+                            gameData.getWinningPoints().getWinOxygen(), gameData.getWinningPoints().getOxygen(),
+                            gameData.getWinningPoints().getWinOcean(), gameData.getWinningPoints().getOcean()
+                    ).stream().map(String::valueOf).toList());
                     this.gameData.setRound(gameData.getRound());
-                    this.gameData.setTemp(gameData.getTemp());
-                    this.gameData.setCo2(gameData.getCo2());
-                    this.gameData.setOcean(gameData.getOcean());
+                    this.gameData.setWinningPoints(gameData.getWinningPoints());
                 }
             }
 
@@ -290,6 +292,45 @@ public class PlayerQueue extends CoreQueue{
             }
             case RESOURCES -> {
                 gameData.getResources().put(msg.getAbout(), msg.getResources().get(msg.getOwners().indexOf(msg.getAbout())));
+                return msg;
+            }
+            case USE_CARD -> {
+                switch (msg.getCards().get(0).getTypeCard()){
+                    case BLUE -> {
+                        List<Long> ids = gameData.getUsedCardBlue().get(msg.getAbout());
+                        ids.add(msg.getCards().get(0).getIndex());
+                        gameData.getUsedCardBlue().put(msg.getAbout(), ids);
+                    }
+                    case GREEN -> {
+                        List<Long> ids = gameData.getUsedCardGreen().get(msg.getAbout());
+                        ids.add(msg.getCards().get(0).getIndex());
+                        gameData.getUsedCardGreen().put(msg.getAbout(), ids);
+                    }
+                    case RED -> {
+                        List<Long> ids = gameData.getUsedCardRed().get(msg.getAbout());
+                        ids.add(msg.getCards().get(0).getIndex());
+                        gameData.getUsedCardRed().put(msg.getAbout(), ids);
+                    }
+                }
+                if(msg.getAbout().equals(uniqName)){
+                    List<Long> ids = new ArrayList<>();
+                    for(Long l: gameData.getCards().get(uniqName)){
+                        if(l != msg.getCards().get(0).getIndex()){
+                            ids.add(l);
+                        }
+                    }
+
+                    gameData.getCards().put(msg.getAbout(), ids);
+                }
+                return msg;
+            }
+            case OTHERS -> {
+                gameData.setRound(Integer.parseInt(msg.getMsg().get(0)));
+                gameData.setWinningPoints(new WinningPoints(
+                        Integer.parseInt(msg.getMsg().get(2)), Integer.parseInt(msg.getMsg().get(6)), Integer.parseInt(msg.getMsg().get(4)),
+                        Integer.parseInt(msg.getMsg().get(1)), Integer.parseInt(msg.getMsg().get(5)), Integer.parseInt(msg.getMsg().get(3))
+                ));
+
                 return msg;
             }
         }

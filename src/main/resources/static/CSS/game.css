@@ -31,6 +31,7 @@ body{
     padding-right: 40px;
 	padding-left: 40px;
 	padding-top: 20px;
+    position: relative;
 }
 
 .mainPart > *{
@@ -701,3 +702,34 @@ body{
 .checkChoosen{
     border: 1px solid #f00;
 }
+
+.anim{
+    position: absolute;
+    right: 34%;
+    rotate: 0deg;
+    scale: 1;
+
+    animation-name: example;
+    animation-duration: 2s;
+    animation-delay: 1s;
+}
+
+@keyframes example {
+    0%   {rotate: 0deg; scale: 1}
+    25%  {rotate: 90deg; scale: 0.8}
+    50%  {rotate: 180deg; scale: 0.5}
+    75%  {rotate: 270deg; scale: 0.3}
+    100% {rotate: 360deg; scale: 0}
+  }
+
+  .clickFlex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .clickFlex > span{
+    position: absolute;
+    font-size: 24px;
+  }

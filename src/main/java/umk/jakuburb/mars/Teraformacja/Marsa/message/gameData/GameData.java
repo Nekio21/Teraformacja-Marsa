@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Area;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.ChatRecord;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Resources;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.WinningPoints;
 import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.GameCoreQueue;
 
 import java.io.Serializable;
@@ -47,12 +48,8 @@ public class GameData implements Serializable {
     @JsonProperty("usersState")
     private HashMap<String, GameCoreQueue.UserState> usersState;
 
-    @JsonProperty("temp")
-    private int temp;
-    @JsonProperty("co2")
-    private int co2;
-    @JsonProperty("ocean")
-    private int ocean;
+    @JsonProperty("winPoints")
+    private WinningPoints winningPoints;
 
     public GameData(){
         chat = new ArrayList<>();
@@ -68,11 +65,11 @@ public class GameData implements Serializable {
         level = new HashMap<>();
         planet = new ArrayList<>();
 
+        winningPoints = new WinningPoints();
         round = 1;
-        temp = 0;
-        co2 = 0;
-        ocean = 0;
     }
+
+
 
     public List<ChatRecord> getChat() {
         return chat;
@@ -162,35 +159,19 @@ public class GameData implements Serializable {
         this.level = level;
     }
 
-    public int getTemp() {
-        return temp;
-    }
-
-    public void setTemp(int temp) {
-        this.temp = temp;
-    }
-
-    public int getCo2() {
-        return co2;
-    }
-
-    public void setCo2(int co2) {
-        this.co2 = co2;
-    }
-
-    public int getOcean() {
-        return ocean;
-    }
-
-    public void setOcean(int ocean) {
-        this.ocean = ocean;
-    }
-
     public HashMap<String, GameCoreQueue.UserState> getUsersState() {
         return usersState;
     }
 
     public void setUsersState(HashMap<String, GameCoreQueue.UserState> usersState) {
         this.usersState = usersState;
+    }
+
+    public WinningPoints getWinningPoints() {
+        return winningPoints;
+    }
+
+    public void setWinningPoints(WinningPoints winningPoints) {
+        this.winningPoints = winningPoints;
     }
 }

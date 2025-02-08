@@ -4,7 +4,8 @@ var playersDiv = document.getElementById("players");
 
 function startClient(){
     return new Promise((resolve, reject) => {
-        client = Stomp.client('ws://127.0.0.1:15674/ws');
+        //client = Stomp.client('ws://127.0.0.1:15674/ws');
+        client = Stomp.client('ws://' + window.location.hostname + ':15674/ws');
         resolve(client)
         console.log("koniec...");
     })

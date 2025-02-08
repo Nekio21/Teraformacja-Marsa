@@ -62,10 +62,10 @@ public class Resources implements Serializable {
         this.titanium = titanium;
     }
 
-    public void fill(){
-        gold = gold + goldProd;
-        energy = energy + energyProd;
-        heat = heat + heatProd;
+    public void fill(int level){
+        gold = gold + goldProd + level;
+        energy = energyProd;
+        heat = heat + heatProd + energy;
         metal = metal + metalProd;
         plants = plants + plantsProd;
         titanium = titanium + titaniumProd;

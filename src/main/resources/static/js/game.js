@@ -15,12 +15,19 @@ const yourCardCheck = document.getElementById("yourCardCheck");
 var cardTypeSelect = "your";
 
 var msgTab = [];
+var testTab;
 
 const resources = new Map();
 const levels = new Map();
+
+var round = 0;
 var tempWK = 0;
 var o2WK = 0;
 var oceanWK = 0;
+var winTemp = 0;
+var winO2 = 0;
+var winOcean = 0;
+
 var gameState;
 const userStates = new Map();
 const cardUsedBlue = new Map();
@@ -32,7 +39,8 @@ var namesOther = [];
 
 function startClient(){
     return new Promise((resolve, reject) => {
-        client = Stomp.client('ws://127.0.0.1:15674/ws');
+        //client = Stomp.client('ws://127.0.0.1:15674/ws');
+        client = Stomp.client('ws://' + window.location.hostname + ':15674/ws');
         resolve(client)
         console.log("koniec...");
     })
@@ -46,8 +54,6 @@ async function startWS(){
 
         client.subscribe("/amq/queue/" + queueSub, function(message) {
             var msg = JSON.parse(message.body)
-
-            console.log(msg);
 
            if(msg.messageType == "MESSAGE_SEND"){
                 let section = document.createElement("section");
@@ -126,13 +132,13 @@ async function startWS(){
                     updateMainCard();
                 }
 				else if(msg.recoverType == "USED_CARDS_BLUE"){
-                    
                 }
 				else if(msg.recoverType == "USED_CARDS_RED"){}
 				else if(msg.recoverType == "USED_CARDS_GREEN"){}
 				else if(msg.recoverType == "CARD"){
                     for(let i=0;i<msg.owners.length;i++){
                         if(msg.owners[i] == playerName){
+                            console.log("dodajem !!!")
                             cardsTab = msg.cardsList[i];
                         }
                     }
@@ -159,8 +165,19 @@ async function startWS(){
                     useLevels(msg.owners)
                 }
 				else if(msg.recoverType == "OTHERS"){
-                    console.log(msg)
 
+                    round = msg.msg[0];
+
+                    winTemp = msg.msg[1];
+                    tempWK = msg.msg[2];
+
+                    winO2 = msg.msg[3];
+                    o2WK = msg.msg[4];
+
+                    winOcean = msg.msg[5];
+                    oceanWK = msg.msg[6];
+
+                    updateOthers()
                 }
             }
             else if(msg.messageType == "GAME_STATE"){
@@ -174,6 +191,7 @@ async function startWS(){
 				else if(msg.msg[0] == "ROUND"){
 					main.style.display = 'flex';
 					cards.style.display = 'none';
+
                 }
             }
             else if(msg.messageType == "MAIN_CARDS"){   
@@ -187,7 +205,8 @@ async function startWS(){
 
                 cards.appendChild(img);
             }
-            else if(msg.messageType == "CARDS10" || msg.messageType == "CARDS"){
+            //else if(msg.messageType == "CARDS10" || msg.messageType == "CARDS"){
+            else if(msg.messageType == "CARDS10"){
                 cards.innerHTML = "";
 
 				let div = document.createElement("div");
@@ -222,8 +241,6 @@ async function startWS(){
 					const ids = [];
 					for(let i=0;i<imgs.length;i++){
 						ids[i] = imgs[i].getAttribute('id')
-						
-						
 					}
 					console.log(ids);
 					
@@ -255,8 +272,25 @@ async function startWS(){
 			}
             else if(msg.messageType == "CARDS"){
                 for(let i=0;i<msg.cards.length; i++){
+                    console.log("dodajem push !!!")
                     cardsTab.push(msg.cards[i])
                 }
+                updateCardConstainer()
+            }
+            else if(msg.messageType == "OTHERS"){
+                    
+                round = msg.msg[0];
+
+                winTemp = msg.msg[1];
+                tempWK = msg.msg[2];
+
+                winO2 = msg.msg[3];
+                o2WK = msg.msg[4];
+
+                winOcean = msg.msg[5];
+                oceanWK = msg.msg[6];
+
+                updateOthers()
             }
             else if(msg.messageType == "USER_STATE"){
                 for(let i=0;i<msg.owners.length;i++){
@@ -266,7 +300,7 @@ async function startWS(){
                 
                 useLevels(msg.owners)
 
-                if(msg.msg[0] == "CHOSE_CARD"){
+                if(userStates.get(playerName) == "CHOSE_CARD"){
 					main.style.display = 'none';
 					cards.style.display = 'flex';
 				}
@@ -277,6 +311,61 @@ async function startWS(){
                     document.getElementById("endRound").classList.remove("endRoundActive");  
                 }
             }
+            else if(msg.messageType == "USE_CARD"){
+                testTab = msg;
+                if(msg.cards[0].typeCard == "BLUE"){
+                    console.log("wwwww")
+                    let list = cardUsedBlue.get(msg.about);
+                    list.push(msg.cards[0]);
+                    cardUsedBlue.set(msg.about, list);
+                    console.log(cardUsedBlue)
+                }
+                else if(msg.cards[0].typeCard == "GREEN"){
+                    console.log("wwww4w")
+                    let list = cardUsedGreen.get(msg.about);
+                    list.push(msg.cards[0]);
+                    cardUsedGreen.set(msg.about, list);
+                    console.log(cardUsedGreen)
+                }
+                else if(msg.cards[0].typeCard == "RED"){
+                    console.log("wwwww5")
+                    let list = cardUsedRed.get(msg.about);
+                    list.push(msg.cards[0]);
+                    cardUsedRed.set(msg.about, list);
+                    console.log(cardUsedRed)
+                }
+
+                for(let i=0;i<cardsTab.length;i++){
+                    if(cardsTab[i].index == msg.cards[0].index){
+                        console.log("Wycinam !!!")
+                        cardsTab.splice(i, 1);
+                        console.log("Wycinam after!!!")
+                    }
+                }
+
+                let img = document.createElement("img");
+                img.src = "data:image/png;base64," + msg.cards[0].image;
+
+                animateCard(img);
+                updateCardConstainer()
+            }
+            else if(msg.messageType == "LEVELS"){
+                console.log(msg)
+                makeLevels(msg.dataLong, msg.owners)
+                useLevels(msg.owners)
+            }
+            else if(msg.messageType == "ERROR"){
+                if(msg.error == "NO_YOUR_MOVE"){
+                    alert("Nie twój ruch")
+                }
+                else if(msg.error == "MONEY"){
+                    alert("za mało pieniedzy");
+                }
+                else{
+                    alert("bład");
+                }
+            }
+            
 //			else if(msg.messageType == "CARDS10"){
 //				alert("karty są :)");
 //			}
@@ -350,6 +439,12 @@ function updatePlayers(){
     options[0].innerHTML =  playerName;
     options[0].value =  playerName;
 
+    if(cardUsedGreen.get(playerName) == undefined){
+        cardUsedGreen.set(playerName, []);
+        cardUsedRed.set(playerName, []);
+        cardUsedBlue.set(playerName, []);
+    }
+
     let playerNameDiv = document.getElementsByClassName('playerName');
 
     for(let i=0;i<playerNameDiv.length;i++){
@@ -357,6 +452,12 @@ function updatePlayers(){
         playerNameDiv[i].id = "playerName" + namesOther[i];
         options[i+1].innerHTML = namesOther[i];
         options[i+1].value = namesOther[i];
+
+        if(cardUsedGreen.get(namesOther[i]) == undefined){
+            cardUsedGreen.set(namesOther[i], []);
+            cardUsedRed.set(namesOther[i], []);
+            cardUsedBlue.set(namesOther[i], []);
+        }
     }
 }
 
@@ -431,10 +532,9 @@ document.getElementById("poligonCards").addEventListener("click", function(){
 });
 
 selectPlayer.addEventListener("change", function(){
-    updateCardConstainer(selectPlayer.value)
+    updateCardConstainer()
 });
 
-updateCardConstainer(playerName)
 
 blueCardCheck.addEventListener("click", function(){
     blueCardCheck.classList.add("checkChoosen");
@@ -491,8 +591,13 @@ function updateCardConstainer(){
         for(let i=0;i<cardsTab.length;i++){
             let img = document.createElement("img");
             img.src = "data:image/png;base64," + cardsTab[i].image;
+            img.style.cursor = "pointer";
+            img.id = "card" + cardsTab[i].id;
             img.addEventListener("dblclick", function(){
+                //cardsContainer.removeChild(img);
+                
                 sendToServer("USE_CARD", [cardsTab[i].index])
+                //cardsTab.splice(i, 1);
             });
 
             cardsContainer.appendChild(img);
@@ -511,7 +616,7 @@ function updateCardConstainer(){
         for(let i=0;i<cardUsedRed.get(value).length;i++){
             let img = document.createElement("img");
             img.src = "data:image/png;base64," + cardUsedRed.get(value)[i].image;
-            
+        
 
             cardsContainer.appendChild(img);
         }
@@ -524,5 +629,83 @@ function updateCardConstainer(){
 
             cardsContainer.appendChild(img);
         }
+    }
+}
+
+function animateCard(img){
+    let anim = document.createElement("div");
+    let mainPart = document.getElementById("mainPart");
+
+    anim.innerHTML = "";
+
+    anim.classList.add("anim");
+    anim.appendChild(img);
+    mainPart.appendChild(anim);
+
+    anim.addEventListener("animationend", function(){
+        mainPart.removeChild(anim);
+    });
+}
+
+function updateOthers(){
+    document.getElementById("roundNumber").innerHTML = "Runda: " + round;
+    
+    let tempDiv = document.getElementById("tempSection");
+    tempDiv.innerHTML = "";
+
+    let tempSpan = document.createElement("span");
+    tempSpan.innerHTML = "Temp. " + (-30 + tempWK*2) + "&#176;";
+    tempDiv.appendChild(tempSpan);
+
+    for(let i=0;i<winTemp;i++){
+        let span = document.createElement("span");
+        span.innerHTML = "device_thermostat";
+        span.classList.add("material-symbols-outlined");
+
+        if(i>tempWK-1){
+            span.classList.add("tempNot");
+        }
+
+        tempDiv.appendChild(span);
+    }
+
+
+    let oxygenDiv = document.getElementById("oxygenSection");
+    oxygenDiv.innerHTML = "";
+
+    let oxygenSpan = document.createElement("span");
+    oxygenSpan.innerHTML = "Tlen " + (o2WK)+ "%";
+    oxygenDiv.appendChild(oxygenSpan);
+
+    for(let i=0;i<winO2;i++){
+        let span = document.createElement("span");
+        span.innerHTML = "spo2";
+        span.classList.add("material-symbols-outlined");
+
+        if(i>o2WK-1){
+            span.classList.add("oxygenStatNot");
+        }
+
+        oxygenDiv.appendChild(span);
+    }
+
+
+    let oceanDiv = document.getElementById("oceanSection");
+    oceanDiv.innerHTML = "";
+
+    let oceanSpan = document.createElement("span");
+    oceanSpan.innerHTML = "Oceania " + (oceanWK);
+    oceanDiv.appendChild(oceanSpan);
+
+    for(let i=0;i<winOcean;i++){
+        let span = document.createElement("span");
+        span.innerHTML = "waves";
+        span.classList.add("material-symbols-outlined");
+
+        if(i>oceanWK-1){
+            span.classList.add("waterStatNot");
+        }
+
+        oceanDiv.appendChild(span);
     }
 }
