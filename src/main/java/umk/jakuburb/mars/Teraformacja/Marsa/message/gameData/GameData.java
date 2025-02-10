@@ -51,6 +51,12 @@ public class GameData implements Serializable {
     @JsonProperty("winPoints")
     private WinningPoints winningPoints;
 
+    @JsonProperty("title")
+    private HashMap<String, String> titles;
+
+    @JsonProperty("prize")
+    private HashMap<String, Boolean> prize;
+
     public GameData(){
         chat = new ArrayList<>();
         players = new ArrayList<>();
@@ -64,6 +70,8 @@ public class GameData implements Serializable {
         usersState = new HashMap<>();
         level = new HashMap<>();
         planet = new ArrayList<>();
+        titles = new HashMap<>();
+        prize = new HashMap<>();
 
         winningPoints = new WinningPoints();
         round = 1;
@@ -173,5 +181,21 @@ public class GameData implements Serializable {
 
     public void setWinningPoints(WinningPoints winningPoints) {
         this.winningPoints = winningPoints;
+    }
+
+    public HashMap<String, String> getTitles() {
+        return titles;
+    }
+
+    public void setTitles(HashMap<String, String> titles) {
+        this.titles = titles;
+    }
+
+    public HashMap<String, Boolean> getPrize() {
+        return prize;
+    }
+
+    public void setPrize(HashMap<String, Boolean> prize) {
+        this.prize = prize;
     }
 }

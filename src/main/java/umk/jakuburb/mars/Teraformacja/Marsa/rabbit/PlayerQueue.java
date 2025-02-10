@@ -10,6 +10,7 @@ import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataCheck;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataProces;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static umk.jakuburb.mars.Teraformacja.Marsa.message.CardToSend.makeListCardToSend;
@@ -62,6 +63,22 @@ public class PlayerQueue extends CoreQueue{
 
         addReceiveFunction(MessageType.USE_CARD, this::save);
         addReceiveFunction(MessageType.OTHERS, this::save);
+
+        addSendFunction(MessageType.TEMP_UP, this::sendToGame);
+        addSendFunction(MessageType.BOARD_TREE, this::sendToGame);
+        addSendFunction(MessageType.BOARD_OCEAN, this::sendToGame);
+        addSendFunction(MessageType.BOARD_CITY, this::sendToGame);
+        addSendFunction(MessageType.PUT_TREE, this::sendToGame);
+        addSendFunction(MessageType.PUT_CITY, this::sendToGame);
+        addSendFunction(MessageType.PUT_OCEAN, this::sendToGame);
+
+        addSendFunction(MessageType.TITLE, this::sendToGame);
+        addReceiveFunction(MessageType.TITLE, this::save);
+
+        addSendFunction(MessageType.PRIZE, this::sendToGame);
+        addReceiveFunction(MessageType.PRIZE, this::save);
+
+        addSendFunction(MessageType.PS, this::sendToGame);
 
         gameData.getCards().put(uniqName, new ArrayList<>());
     }
@@ -158,7 +175,6 @@ public class PlayerQueue extends CoreQueue{
                     List<List<Long>> ids = gameData.getPlayers().stream().map(e->gameData.getUsedCardRed().get(e)).toList();
                     List<List<Card>> cards = gameData.getPlayers().stream().map(e->cardRepository.getCards(gameData.getUsedCardRed().get(e))).toList();
 
-
                     msgToSend.setOwners(gameData.getPlayers());
                     msgToSend.setDataListLong(ids);
                     msgToSend.setListCards(makeListCardToSend(cards));
@@ -167,7 +183,6 @@ public class PlayerQueue extends CoreQueue{
                 case USED_CARDS_GREEN ->{
                     List<List<Long>> ids = gameData.getPlayers().stream().map(e->gameData.getUsedCardGreen().get(e)).toList();
                     List<List<Card>> cards = gameData.getPlayers().stream().map(e->cardRepository.getCards(gameData.getUsedCardGreen().get(e))).toList();
-
 
                     msgToSend.setOwners(gameData.getPlayers());
                     msgToSend.setDataListLong(ids);
@@ -331,6 +346,14 @@ public class PlayerQueue extends CoreQueue{
                         Integer.parseInt(msg.getMsg().get(1)), Integer.parseInt(msg.getMsg().get(5)), Integer.parseInt(msg.getMsg().get(3))
                 ));
 
+                return msg;
+            }
+            case TITLE -> {
+                gameData.getTitles().put(msg.getMsg().get(0), msg.getAbout());
+                return msg;
+            }
+            case PRIZE ->{
+                gameData.getPrize().put(msg.getMsg().get(0), true);
                 return msg;
             }
         }

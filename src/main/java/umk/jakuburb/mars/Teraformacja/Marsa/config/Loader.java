@@ -61,6 +61,11 @@ public class Loader implements ApplicationRunner {
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.GOLD, 7)
         ));
 
+        saveMainCard("mainCard4.png", List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS_PROD, 5),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 11)
+        ));
+
         saveCard("card1.png",31, Card.TypeCard.BLUE, new ArrayList<>());
         saveCard("card2.png", 13,Card.TypeCard.GREEN, new ArrayList<>());
         saveCard("card3.png", 15,Card.TypeCard.BLUE, new ArrayList<>());
@@ -91,7 +96,9 @@ public class Loader implements ApplicationRunner {
         saveCard("card15.png", 1, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.ENERGY, 3)
         ));
-        saveCard("card16.png", 1, Card.TypeCard.RED, List.of());
+        saveCard("card16.png", 1, Card.TypeCard.RED, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT, 3)
+        ));
         saveCard("card17.png", 5, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 1)
         ));

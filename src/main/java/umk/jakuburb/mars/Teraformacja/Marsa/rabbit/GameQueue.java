@@ -3,6 +3,7 @@ package umk.jakuburb.mars.Teraformacja.Marsa.rabbit;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Card;
+import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.CardRepository;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.*;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.Error;
@@ -14,12 +15,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static umk.jakuburb.mars.Teraformacja.Marsa.message.Area.NOTHING;
-import static umk.jakuburb.mars.Teraformacja.Marsa.message.Area.NO_OCEAN;
+import static umk.jakuburb.mars.Teraformacja.Marsa.message.Area.*;
 import static umk.jakuburb.mars.Teraformacja.Marsa.message.MessageType.*;
+import static umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataProces.check;
 import static umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataProces.useCard;
 
 public class GameQueue extends GameCoreQueue implements Timerable {
@@ -75,6 +77,26 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
         addReceiveFunction(MessageType.NEXT_ROUND, this::monitorUserMove);
         checkAndSave.put(MessageType.NEXT_ROUND, this::nextRoundCAS);
+
+        addReceiveFunction(TEMP_UP, this::monitorUserMove);
+        checkAndSave.put(TEMP_UP, this::tempUPCAS);
+
+        addReceiveFunction(TITLE, this::monitorUserMove);
+        checkAndSave.put(TITLE, this::titleCAS);
+
+        addReceiveFunction(PRIZE, this::monitorUserMove);
+        checkAndSave.put(PRIZE, this::prizeCAS);
+
+        addReceiveFunction(PS, this::monitorUserMove);
+        checkAndSave.put(PS, this::psCAS);
+
+        addReceiveFunction(BOARD_TREE, this::boardTree);
+        addReceiveFunction(BOARD_OCEAN, this::boardOcean);
+        addReceiveFunction(BOARD_CITY, this::boardCity);
+
+        addReceiveFunction(PUT_TREE, this::putTree);
+        addReceiveFunction(PUT_CITY, this::putCity);
+        addReceiveFunction(PUT_OCEAN, this::putOcean);
     }
 
     public void initGameData(List<String> players){
@@ -106,6 +128,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
         cardsToChose.clear();
     }
+
 
     private void card10Receive(MyMessage msg){
         if(gameDate.getUsersState().get(msg.getFrom()) != UserState.CHOSE_CARD) return;
@@ -176,6 +199,231 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         System.out.println("endGame");
     }
 
+
+    private Error psCAS(MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            return Error.NO_YOUR_MOVE;
+        }
+
+        WinningPoints winningPoints = gameDate.getWinningPoints();
+        Resources resources = gameDate.getResources().get(about);
+        AtomicInteger pz = new AtomicInteger();
+        pz.set(0);
+
+        Error error1;
+        Error error2;
+
+        if(msg.getMsg().get(0).equals("HEAT")){
+            error1 = winningPoints.put(CardSkills.Resource.TEMP,1, true, pz);
+            error2 = resources.put(CardSkills.Resource.GOLD, 14, false);
+        }else if(msg.getMsg().get(0).equals("ENERGY")){
+            error1 = resources.put(CardSkills.Resource.ENERGY_PROD, 11, true);
+            error2 = resources.put(CardSkills.Resource.GOLD, 14, false);
+        }else{
+            return Error.DEFAULT;
+        }
+
+        if(error1 != Error.NO_ERROR){
+            return error1;
+        }
+        else if(error2 != Error.NO_ERROR){
+            return error2;
+        }
+
+        gameDate.setWinningPoints(winningPoints);
+        gameDate.getResources().put(about, resources);
+        gameDate.getLevel().put(about, gameDate.getLevel().get(about) + pz.get());
+
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
+        }
+        else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
+            nextRoundCAS(msg);
+        }
+
+        sendStates();
+        sendResources(about);
+        sendOthers(about);
+        sendLevel(about);
+
+        return Error.NO_ERROR;
+    }
+
+    private Error prizeCAS(MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            return Error.NO_YOUR_MOVE;
+        }
+
+        if(gameDate.getPrize().values().stream().count() > 2){
+            return Error.NO_MORE_PRIZE;
+        }
+
+        int price = (int)gameDate.getPrize().values().stream().count() * 8;
+
+        Resources resources = gameDate.getResources().get(about);
+        Error error = resources.put(CardSkills.Resource.GOLD, price, false);
+
+        if(error != Error.NO_ERROR){
+            return error;
+        }
+
+        ArrayList tab = new ArrayList(List.of(
+                "PZ", "GOLD", "LEAF", "ENERGY", "HEAT"
+        ));
+
+        if(gameDate.getPrize().get(msg.getMsg().get(0)) != null){
+            return Error.OCCUPIED;
+        }
+
+        if(!tab.contains(msg.getMsg().get(0))){
+            return Error.DEFAULT;
+        }
+
+        gameDate.getPrize().put(msg.getMsg().get(0), true);
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
+        }
+        else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
+            nextRoundCAS(msg);
+        }
+
+        msg.setOwners(gameDate.getPlayers());
+
+        gameDate.getResources().put(about, resources);
+
+        sendStates();
+        sendResources(about);
+
+        return Error.NO_ERROR;
+    }
+
+    private Error titleCAS(MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            return Error.NO_YOUR_MOVE;
+        }
+
+        if(gameDate.getTitles().values().stream().count() > 2){
+            return Error.NO_MORE_TITLE;
+        }
+
+        Resources resources = gameDate.getResources().get(about);
+        Error error = resources.put(CardSkills.Resource.GOLD, 8, false);
+
+        if(error != Error.NO_ERROR){
+            return error;
+        }
+
+        if(msg.getMsg().get(0).equals("PZ")){
+            if((gameDate.getLevel().get(about) >= 35)&&gameDate.getTitles().get("PZ") == null){
+                gameDate.getTitles().put("PZ", about);
+            }else {
+                return Error.TITLE;
+            }
+        }
+        else if(msg.getMsg().get(0).equals("CITY")){
+
+            if(gameDate.getTitles().get("CITY") != null){
+                return Error.OCCUPIED;
+            }
+
+            Area a;
+            int index = gameDate.getPlayers().indexOf(about);
+
+            if(index == 0){
+                a = CITY_P1;
+            }else if(index == 1){
+                a = CITY_P2;
+            }else if(index == 2){
+                a = CITY_P3;
+            }else {
+                return Error.DEFAULT;
+            }
+
+            int count = 0;
+
+            for(Area area: gameDate.getPlanet()){
+                if(area == a){
+                    count++;
+                }
+            }
+
+            if(count >= 3){
+                gameDate.getTitles().put("CITY", about);
+            }else{
+                return Error.TITLE;
+            }
+        }
+        else if(msg.getMsg().get(0).equals("FOREST")){
+            if(gameDate.getTitles().get("FOREST") != null){
+                return Error.OCCUPIED;
+            }
+
+            Area a;
+            int index = gameDate.getPlayers().indexOf(about);
+
+            if(index == 0){
+                a = TREE_P1;
+            }else if(index == 1){
+                a = TREE_P2;
+            }else if(index == 2){
+                a = TREE_P3;
+            }else {
+                return Error.DEFAULT;
+            }
+
+            int count = 0;
+
+            for(Area area: gameDate.getPlanet()){
+                if(area == a){
+                    count++;
+                }
+            }
+
+            if(count >= 3){
+                gameDate.getTitles().put("FOREST", about);
+            }else{
+                return Error.TITLE;
+            }
+        }
+        else if(msg.getMsg().get(0).equals("CARD")){
+            if((gameDate.getCards().get(about).stream().count() >= 15)&&gameDate.getTitles().get("CARD") == null){
+                gameDate.getTitles().put("CARD", about);
+            }else{
+                return Error.TITLE;
+            }
+        }
+        else if(msg.getMsg().get(0).equals("SYMBOLS")){
+
+        }
+        else{
+            return Error.DEFAULT;
+        }
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
+        }
+        else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
+            nextRoundCAS(msg);
+        }
+
+        msg.setOwners(gameDate.getPlayers());
+
+        gameDate.getResources().put(about, resources);
+
+        sendStates();
+        sendResources(about);
+
+        return Error.NO_ERROR;
+    }
+
     private Error nextRoundCAS(MyMessage msg){
         if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
             return Error.NO_YOUR_MOVE;
@@ -194,6 +442,374 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
         return Error.NO_ERROR;
     }
+
+    private void boardCity(MyMessage msg){
+        String about = msg.getAbout();
+        Area area;
+
+        switch (gameDate.getPlayers().indexOf(about)){
+            case 0 -> {
+                area = CITY_P1;
+            }
+            case 1 -> {
+                area = CITY_P2;
+            }
+            case 2 -> {
+                area = CITY_P3;
+            }
+            default -> {
+                sendErrorMessage(about, Error.DEFAULT);
+                return;
+            }
+        }
+
+        board(area, msg);
+    }
+
+    private void boardTree(MyMessage msg){
+        String about = msg.getAbout();
+        Area area;
+
+        switch (gameDate.getPlayers().indexOf(about)){
+            case 0 -> {
+                area = TREE_P1;
+            }
+            case 1 -> {
+                area = TREE_P2;
+            }
+            case 2 -> {
+                area = TREE_P3;
+            }
+            default -> {
+                sendErrorMessage(about, Error.DEFAULT);
+                return;
+            }
+        }
+
+        board(area, msg);
+    }
+
+    private void boardOcean(MyMessage msg){
+        board(OCEAN, msg);
+    }
+
+    private void board(Area a, MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            sendErrorMessage(about, Error.NO_YOUR_MOVE);
+            return;
+        }
+
+        Area area = a;
+
+        List<Area> list;
+
+        try {
+            list = Board.getBoardTF(area, gameDate.getPlanet());
+        } catch (Exception e) {
+            sendErrorMessage(about, Error.DEFAULT);
+            return;
+        }
+
+        msg.setMsg(list.stream().map(Enum::toString).toList());
+
+        sendToUser(msg);
+    }
+
+    private void putOcean(MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            sendErrorMessage(about, Error.NO_YOUR_MOVE);
+            return;
+        }
+
+        Area ocean = OCEAN;
+
+        int areaIndex = Integer.parseInt(msg.getMsg().get(0));
+        List<Area> list = gameDate.getPlanet();
+
+        if(list.get(areaIndex) != NOTHING && list.get(areaIndex) != NO_OCEAN){
+            sendErrorMessage(about, Error.AREA_OCCUPIED);
+        }
+
+        ArrayList<Area> listNew = new ArrayList<>();
+        for(Area a: list){
+            listNew.add(a);
+        }
+
+        WinningPoints winningPoints = gameDate.getWinningPoints();
+        Resources resources = gameDate.getResources().get(about);
+        AtomicInteger pz = new AtomicInteger();
+        List<Area> freeAreas;
+
+        pz.set(0);
+
+        try {
+            freeAreas = Board.getBoardTF(ocean, listNew);
+        } catch (Exception e) {
+            sendErrorMessage(about, Error.DEFAULT);
+            return;
+        }
+
+        if(freeAreas.get(areaIndex) == TRUE){
+            listNew.set(areaIndex, ocean);
+            Error error1 = winningPoints.put(CardSkills.Resource.OCEAN,1, true, pz);
+            Error error2;
+            error2 = resources.put(CardSkills.Resource.GOLD, 18, false);
+
+
+            if(error1 != Error.NO_ERROR){
+                sendErrorMessage(about, Error.OXYGEN);
+                return;
+            }
+            if(error2 != Error.NO_ERROR){
+                sendErrorMessage(about, Error.PLANTS);
+                return;
+            }
+        }
+        else{
+            sendErrorMessage(about, Error.DEFAULT);
+            return;
+        }
+
+        gameDate.setWinningPoints(winningPoints);
+        gameDate.getResources().put(about, resources);
+        gameDate.getLevel().put(about, gameDate.getLevel().get(about) + pz.get());
+        gameDate.setPlanet(listNew);
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
+        }
+        else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
+            nextRoundCAS(msg);
+        }
+
+        sendStates();
+        sendResources(about);
+        sendOthers(about);
+        sendLevel(about);
+        sendPlanet(about);
+    }
+
+    private void putCity(MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            sendErrorMessage(about, Error.NO_YOUR_MOVE);
+            return;
+        }
+
+        Area city;
+
+        switch (gameDate.getPlayers().indexOf(msg.getAbout())){
+            case 0 -> city = CITY_P1;
+            case 1 -> city = CITY_P2;
+            case 2 -> city = CITY_P3;
+            default -> {
+                sendErrorMessage(about, Error.DEFAULT);
+                return;
+            }
+        }
+
+        int areaIndex = Integer.parseInt(msg.getMsg().get(0));
+        List<Area> list = gameDate.getPlanet();
+
+        if(list.get(areaIndex) != NOTHING && list.get(areaIndex) != NO_OCEAN){
+            sendErrorMessage(about, Error.AREA_OCCUPIED);
+        }
+
+        ArrayList<Area> listNew = new ArrayList<>();
+        for(Area a: list){
+            listNew.add(a);
+        }
+
+        Resources resources = gameDate.getResources().get(about);
+        List<Area> freeAreas;
+
+        try {
+            freeAreas = Board.getBoardTF(city, listNew);
+        } catch (Exception e) {
+            sendErrorMessage(about, Error.DEFAULT);
+            return;
+        }
+
+        if(freeAreas.get(areaIndex) == TRUE){
+            listNew.set(areaIndex, city);
+            Error error2;
+            error2 = resources.put(CardSkills.Resource.GOLD, 25, false);
+            Error error1 = resources.put(CardSkills.Resource.GOLD_PROD, 1, true);
+
+            if(error1 != Error.NO_ERROR){
+                sendErrorMessage(about, error1);
+                return;
+            }
+            if(error2 != Error.NO_ERROR){
+                sendErrorMessage(about, Error.CITY);
+                return;
+            }
+        }
+        else{
+            sendErrorMessage(about, Error.DEFAULT);
+            return;
+        }
+
+        gameDate.getResources().put(about, resources);
+        gameDate.setPlanet(listNew);
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
+        }
+        else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
+            nextRoundCAS(msg);
+        }
+
+        sendStates();
+        sendResources(about);
+        sendOthers(about);
+        sendPlanet(about);
+    }
+
+    private void putTree(MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            sendErrorMessage(about, Error.NO_YOUR_MOVE);
+            return;
+        }
+
+        Area tree;
+
+        switch (gameDate.getPlayers().indexOf(msg.getAbout())){
+            case 0 -> tree = TREE_P1;
+            case 1 -> tree = TREE_P2;
+            case 2 -> tree = TREE_P3;
+            default -> {
+                sendErrorMessage(about, Error.DEFAULT);
+                return;
+            }
+        }
+
+        int areaIndex = Integer.parseInt(msg.getMsg().get(0));
+        List<Area> list = gameDate.getPlanet();
+
+        if(list.get(areaIndex) != NOTHING && list.get(areaIndex) != NO_OCEAN){
+            sendErrorMessage(about, Error.AREA_OCCUPIED);
+        }
+
+        ArrayList<Area> listNew = new ArrayList<>();
+        for(Area a: list){
+            listNew.add(a);
+        }
+
+        WinningPoints winningPoints = gameDate.getWinningPoints();
+        Resources resources = gameDate.getResources().get(about);
+        AtomicInteger pz = new AtomicInteger();
+        List<Area> freeAreas;
+
+        pz.set(0);
+
+        try {
+            freeAreas = Board.getBoardTF(tree, listNew);
+        } catch (Exception e) {
+            sendErrorMessage(about, Error.DEFAULT);
+            return;
+        }
+
+
+
+        if(freeAreas.get(areaIndex) == TRUE){
+            listNew.set(areaIndex, tree);
+            Error error1 = winningPoints.put(CardSkills.Resource.OXYGEN,1, true, pz);
+            Error error2;
+            if(msg.getMsg().get(1).equals("money")){
+                error2 = resources.put(CardSkills.Resource.GOLD, 23, false);
+            }else if(msg.getMsg().get(1).equals("leaf")){
+                error2 = resources.put(CardSkills.Resource.PLANTS, resources.getPlantsToForest(), false);
+            }else{
+                sendErrorMessage(about, Error.DEFAULT);
+                return;
+            }
+
+            if(error1 != Error.NO_ERROR){
+                sendErrorMessage(about, Error.OXYGEN);
+                return;
+            }
+            if(error2 != Error.NO_ERROR){
+                sendErrorMessage(about, Error.PLANTS);
+                return;
+            }
+        }
+        else{
+            sendErrorMessage(about, Error.DEFAULT);
+            return;
+        }
+
+        gameDate.setWinningPoints(winningPoints);
+        gameDate.getResources().put(about, resources);
+        gameDate.getLevel().put(about, gameDate.getLevel().get(about) + pz.get());
+        gameDate.setPlanet(listNew);
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
+        }
+        else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
+            nextRoundCAS(msg);
+        }
+
+        sendStates();
+        sendResources(about);
+        sendOthers(about);
+        sendLevel(about);
+        sendPlanet(about);
+    }
+
+    private Error tempUPCAS(MyMessage msg){
+        String about = msg.getAbout();
+
+        if(gameDate.getUsersState().get(msg.getAbout()) != UserState.FIRST_MOVE && gameDate.getUsersState().get(msg.getAbout()) != UserState.SECOND_MOVE){
+            return Error.NO_YOUR_MOVE;
+        }
+
+        Resources resources = gameDate.getResources().get(about);
+        WinningPoints winningPoints = gameDate.getWinningPoints();
+
+        if(resources.getHeatToTemp() >  resources.getHeat()){
+            return Error.HEAT;
+        }
+
+        AtomicInteger pz = new AtomicInteger();
+        pz.set(0);
+
+        Error error = resources.put(CardSkills.Resource.HEAT, resources.getHeatToTemp(), false);
+        Error error2 = winningPoints.put(CardSkills.Resource.TEMP, 1, true , pz);
+
+        if(error != Error.NO_ERROR){
+            return error;
+        }else if(error2 != Error.NO_ERROR){
+            return error2;
+        }
+
+        gameDate.getResources().put(about, resources);
+        gameDate.setWinningPoints(winningPoints);
+        gameDate.getLevel().put(about, gameDate.getLevel().get(about) + pz.get());
+
+        if(gameDate.getUsersState().get(about) == UserState.FIRST_MOVE){
+            gameDate.getUsersState().put(about, UserState.SECOND_MOVE);
+        }
+        else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
+            nextRoundCAS(msg);
+        }
+
+        sendStates();
+        sendResources(about);
+        sendOthers(about);
+        sendLevel(about);
+
+        return Error.NO_ERROR;
+    }
+
 
     public Error useCardCAS(MyMessage msg){
         String about = msg.getAbout();
@@ -303,6 +919,16 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         myMessage.setMessageType(MessageType.RESOURCES);
         myMessage.setResources(gameDate.getPlayers().stream().map(e->gameDate.getResources().get(e)).toList());
         myMessage.setOwners(gameDate.getPlayers());
+
+        sendToUsers(myMessage);
+    }
+
+    private void sendPlanet(String user){
+        MyMessage myMessage = new MyMessage();
+        myMessage.setFrom(NAME);
+        myMessage.setAbout(user);
+        myMessage.setMessageType(MessageType.PLANET);
+        myMessage.setMsg(gameDate.getPlanet().stream().map(Enum::toString).toList());
 
         sendToUsers(myMessage);
     }

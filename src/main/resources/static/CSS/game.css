@@ -733,3 +733,18 @@ body{
     position: absolute;
     font-size: 24px;
   }
+
+  .resourceIconHover{
+    cursor: pointer;
+    border-width: 3px;
+    border-style: double;
+    border-image: linear-gradient(to right, #1e1bd1 0%, #bdad1a 100%) 2;
+  }
+
+  .boardAreaClick{
+    cursor: pointer;
+  }
+
+  .boardAreaNotClick{
+    opacity: 0.4;
+  }

@@ -37,6 +37,15 @@ const mainCard = new Map();
 var cardsTab = [];
 var namesOther = [];
 
+var planet;
+
+var clickableArea = [];
+var heatIconAEL = false;
+var plantsIconAEL = false;
+
+var boardClick = "";
+var treeMoney = "";
+
 function startClient(){
     return new Promise((resolve, reject) => {
         //client = Stomp.client('ws://127.0.0.1:15674/ws');
@@ -124,6 +133,7 @@ async function startWS(){
                     }
 
                     updatePlayers()
+                    updateColors(msg.msg);
                 }
 				else if(msg.recoverType == "MAIN_CARD"){
                     for(let i=0;i<msg.owners.length;i++){
@@ -157,7 +167,8 @@ async function startWS(){
 				}
 				else if(msg.recoverType == "PLANET"){
                     console.log(msg)
-                    makePlanet(msg.msg);
+                    planet = msg.msg;
+                    makePlanet();
                 }
 				else if(msg.recoverType == "LEVEL"){
                     console.log(msg)
@@ -201,6 +212,7 @@ async function startWS(){
 
                 img.addEventListener("click", function(){
                     sendToServer("MAIN_CARDS", [msg.cards[0].index])
+                    planetRefresh()
                 });
 
                 cards.appendChild(img);
@@ -250,6 +262,7 @@ async function startWS(){
 					}
 					else{
 						sendToServer(msg.messageType, ids)
+                        planetRefresh();
                         main.style.display = 'flex';
 					    cards.style.display = 'none';
                         document.getElementById("timerText").innerHTML = "Prosze Czekać :)"
@@ -354,6 +367,31 @@ async function startWS(){
                 makeLevels(msg.dataLong, msg.owners)
                 useLevels(msg.owners)
             }
+            else if(msg.messageType == "BOARD_TREE"){
+                planetRefresh();
+                boardClick = "tree";
+                planetTree(msg.msg);
+            }
+            else if(msg.messageType == "BOARD_CITY"){
+                planetRefresh();
+                boardClick = "city";
+                planetTree(msg.msg);
+            }
+            else if(msg.messageType == "BOARD_OCEAN"){
+                planetRefresh();
+                boardClick = "ocean";
+                planetTree(msg.msg);
+            }
+            else if(msg.messageType == "PLANET"){
+                planet = msg.msg;
+                makePlanet();
+            }
+            else if(msg.messageType == "TITLE"){
+                title(msg);
+            }
+            else if(msg.messageType == "PRIZE"){
+                prize(msg)
+            }
             else if(msg.messageType == "ERROR"){
                 if(msg.error == "NO_YOUR_MOVE"){
                     alert("Nie twój ruch")
@@ -362,7 +400,7 @@ async function startWS(){
                     alert("za mało pieniedzy");
                 }
                 else{
-                    alert("bład");
+                    alert("błąd");
                 }
             }
             
@@ -412,24 +450,61 @@ function createMessageObject(messageTypeMethod, msgMethod){
 
 function resourceInput(){
 	let r = resources.get(playerName)
-	
+	let heatIcon = document.getElementById('heatIcon');
+    let plantsIcon = document.getElementById('plantsIcon');
+
 	document.getElementById('goldR').innerHTML = r.gold + "[+" + r.goldProd + "]";
-	document.getElementById('metalR').innerHTML = r.metal + "[+" + r.metalProd + "]";
-	document.getElementById('titaniumR').innerHTML = r.titanium + "[+" + r.titaniumProd + "]";
-	document.getElementById('plantsR').innerHTML = r.plants + "[+" + r.plantsProd + "]";
+	document.getElementById('metalR').innerHTML = r.metal + "[+" + r.metalProd + " :" + r.metaltg  +"]";
+	document.getElementById('titaniumR').innerHTML = r.titanium + "[+" + r.titaniumProd + " :" + r.titaniumtg + "]";
+	document.getElementById('plantsR').innerHTML = r.plants + "[+" + r.plantsProd + "/" + r.plantstf+ "]";
 	document.getElementById('energyR').innerHTML = r.energy + "[+" + r.energyProd + "]";
-	document.getElementById('heatR').innerHTML = r.heat + "[+" + r.heatProd + "]";
+	document.getElementById('heatR').innerHTML = r.heat + "[+" + r.heatProd + "/" + r.heattt + "]";
+
+    if(r.heat >= r.heattt){
+        heatIcon.classList.add("resourceIconHover");
+        if(heatIconAEL == false){
+            heatIcon.addEventListener("click", function(){
+                if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+                    if(resources.get(playerName).heat >= resources.get(playerName).heattt){
+                        sendToServer("TEMP_UP", []);
+                        planetRefresh()
+                    }
+                }
+            });
+            heatIconAEL = true;
+        }
+    }else{
+        heatIcon.classList.remove("resourceIconHover");
+    }
+
+    if(r.plants >= r.plantstf){
+        plantsIcon.classList.add("resourceIconHover");
+
+        if(plantsIconAEL == false){
+            plantsIcon.addEventListener("click", function(){
+                if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+                    if(resources.get(playerName).plants >= resources.get(playerName).plantstf){
+                        treeMoney = "leaf";
+                        sendToServer("BOARD_TREE", []);
+                    }
+                }
+            });
+            plantsIconAEL = true;
+        }
+    }else{
+        plantsIcon.classList.remove("resourceIconHover");
+    }
 
     for(let i=0;i<namesOther.length;i++){
         let r = resources.get(namesOther[i])
         let sections = document.getElementById("playerName" + namesOther[i]).parentElement.getElementsByClassName("infoPlayerContainer")[0].getElementsByTagName("section");
 
         sections[0].getElementsByTagName("span")[0].innerHTML = r.gold + "[+" + r.goldProd + "]";
-        sections[1].getElementsByTagName("span")[0].innerHTML = r.metal + "[+" + r.metalProd + "]";
-        sections[2].getElementsByTagName("span")[0].innerHTML = r.titanium + "[+" + r.titaniumProd + "]";
-        sections[3].getElementsByTagName("span")[0].innerHTML = r.plants + "[+" + r.plantsProd + "]";
+        sections[1].getElementsByTagName("span")[0].innerHTML = r.metal + "[+" + r.metalProd + " :" + r.metaltg  + "]";
+        sections[2].getElementsByTagName("span")[0].innerHTML = r.titanium + "[+" + r.titaniumProd + " :" + r.titaniumtg + "]";
+        sections[3].getElementsByTagName("span")[0].innerHTML = r.plants + "[+" + r.plantsProd + "/" + r.plantstf+ "]";
         sections[4].getElementsByTagName("span")[0].innerHTML = r.energy + "[+" + r.energyProd + "]";
-        sections[5].getElementsByTagName("span")[0].innerHTML = r.heat + "[+" + r.heatProd + "]";
+        sections[5].getElementsByTagName("span")[0].innerHTML = r.heat + "[+" + r.heatProd + "/" + r.heattt +"]";
     }
 }
 
@@ -461,7 +536,73 @@ function updatePlayers(){
     }
 }
 
-function makePlanet(tab){
+function planetTree(tab){
+    let rows = document.getElementsByClassName("row");
+    var w=0;
+    let i = 0;
+
+    clickableArea = [];
+
+    for(let x=0;x<rows.length;x++){
+        let divs = rows[x].getElementsByTagName('div');
+        for(let y=0;y<divs.length;y++){
+            if(tab[w]=="TRUE"){
+                divs[y].classList.add("boardAreaClick");
+                divs[y].param = divs[y].getAttribute("index");
+                clickableArea[i] = divs[y].getAttribute("index");
+                divs[y].addEventListener("click", planetF);
+                i++;
+            }
+            else if(tab[w]=="FALSE"){
+                divs[y].classList.add("boardAreaNotClick");
+            }
+
+            w++;
+        }
+    }
+}
+
+function planetF(evt){
+    planetFDo(evt);
+}
+
+function planetFDo(evt){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        if(clickableArea.includes(evt.currentTarget.param)){
+            if(boardClick=="tree"){
+                if(treeMoney == "money"){
+                    sendToServer("PUT_TREE", [evt.currentTarget.param, "money"]);
+                }else if(treeMoney == "leaf"){
+                    sendToServer("PUT_TREE", [evt.currentTarget.param, "leaf"]);
+                }
+            }else if(boardClick=="city"){
+                sendToServer("PUT_CITY", [evt.currentTarget.param]);
+            }else if(boardClick == "ocean"){
+                sendToServer("PUT_OCEAN", [evt.currentTarget.param]);
+            }
+            
+            planetRefresh();
+        }
+    }
+}
+
+function planetRefresh(){
+    let rows = document.getElementsByClassName("row");
+
+    clickableArea = [];
+    boardClick = "";
+
+    for(let x=0;x<rows.length;x++){
+        let divs = rows[x].getElementsByTagName('div');
+        for(let y=0;y<divs.length;y++){
+            divs[y].removeEventListener("click", planetF);
+            divs[y].classList.remove("boardAreaNotClick");
+            divs[y].classList.remove("boardAreaClick");
+        }
+    }
+}
+
+function makePlanet(){
     let rows = document.getElementsByClassName("row");
     let w=0;
 
@@ -469,18 +610,40 @@ function makePlanet(tab){
         let divs = rows[x].getElementsByTagName('div');
         for(let y=0;y<divs.length;y++){
             divs[y].innerHTML = "";
+            divs[y].setAttribute('index', w);
             let img = document.createElement("img");
+            
+            let span = document.createElement("span");
+            span.style.position = "absolute";
+            span.style.width = "100%";
+            span.style.height = "100%";
+            span.style.textAlign = "center";
+            span.style.lineHeight = "4";
+            span.style.left = "0";
+
             img.style.width = "63px";
             img.style.height = "73px";
             
-            if(tab[w]=="NOTHING"){
+            if(planet[w]=="NOTHING"){
                 img.src = "../../assets/rect.svg";
             }
-            else if(tab[w]=="NO_OCEAN"){
+            else if(planet[w]=="NO_OCEAN"){
                 img.src = "../../assets/rectWater.svg";
             }
+            else if(planet[w]=="TREE_P1"){
+                img.src = "../../assets/rectTreeP1.svg";
+            }
+            else if(planet[w]=="TREE_P2"){
+                img.src = "../../assets/rectTreeP2.svg"; 
+            }
+            else if(planet[w]=="TREE_P3"){
+                img.src = "../../assets/rectTreeP3.svg";  
+            }
 
+            span.innerHTML = w;
+            
             divs[y].appendChild(img);
+            divs[y].appendChild(span);
             w++;
         }
     }
@@ -531,6 +694,101 @@ document.getElementById("poligonCards").addEventListener("click", function(){
     document.getElementsByClassName("cardsTab")[0].style.display = "flex";
 });
 
+
+document.getElementById("title1").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("TITLE",["PZ"]);
+    }
+});
+
+document.getElementById("title2").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("TITLE",["CITY"]);
+    }
+});
+
+document.getElementById("title3").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("TITLE",["FOREST"]);
+    }
+});
+
+document.getElementById("title4").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("TITLE",["CARD"]);
+    }
+});
+
+document.getElementById("title5").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("TITLE",["SYMBOLS"]);
+    }
+});
+
+
+document.getElementById("prize1").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("PRIZE",["PZ"]);
+    }
+});
+
+document.getElementById("prize2").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("PRIZE",["GOLD"]);
+    }
+});
+
+document.getElementById("prize3").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("PRIZE",["LEAF"]);
+    }
+});
+
+document.getElementById("prize4").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("PRIZE",["ENERGY"]);
+    }
+});
+
+document.getElementById("prize5").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("PRIZE",["HEAT"]);
+    }
+});
+
+
+document.getElementById("ps1").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("PS",["ENERGY"]);
+    }
+});
+
+document.getElementById("ps2").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("BOARD_WATER", []);
+    }
+});
+
+document.getElementById("ps3").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("PS",["TEMP"]);
+    }
+});
+
+document.getElementById("ps4").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        treeMoney = "money";
+        sendToServer("BOARD_TREE", []);
+    }
+});
+
+document.getElementById("ps5").addEventListener("click", function(){
+    if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
+        sendToServer("BOARD_CITY", []);
+    }
+});
+
+
 selectPlayer.addEventListener("change", function(){
     updateCardConstainer()
 });
@@ -579,8 +837,118 @@ yourCardCheck.addEventListener("click", function(){
 document.getElementById("endRound").addEventListener("click", function(){
     if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
         sendToServer("NEXT_ROUND",[playerName])
+        planetRefresh()
     }
 });
+
+
+function prize(msg){
+    let index = 0;
+    let colors = [
+        "#15616D",
+        "#6D1515",
+        "#6D4515"
+    ];
+
+    for(let i=0;i<msg.owners.length;i++){
+        if(msg.owners[i] == msg.about){
+            index = i+1;
+        }
+    }
+
+    var prizeDiv;
+    var img = document.createElement("img");
+    var span = document.createElement("span");
+
+    img.src = "../../assets/rectP" + index + ".svg";
+    img.style.width = "60px";
+    img.style.width = "69px";
+
+    span.classList.add("material-symbols-outlined");
+    span.style.color = colors[index];
+    span.style.fontSize = "30px"
+
+    if(msg.msg[0] == "PZ"){
+        prizeDiv = document.getElementById("prize1");
+        span.innerHTML = "token";
+    }
+    else if(msg.msg[0] == "GOLD"){
+        prizeDiv = document.getElementById("prize2");
+        span.innerHTML = "paid";
+    }
+    else if(msg.msg[0] == "LEAF"){
+        prizeDiv = document.getElementById("prize3");
+        span.innerHTML = "eco";
+    }
+    else if(msg.msg[0] == "ENERGY"){
+        prizeDiv = document.getElementById("prize4");
+        span.innerHTML = "bolt";
+    }
+    else if(msg.msg[0] == "HEAT"){
+        prizeDiv = document.getElementById("prize5");
+        span.innerHTML = "local_fire_department";
+    }
+
+    prizeDiv.parentElement.style.cursor = "inherit";
+    prizeDiv.innerHTML = "";
+    prizeDiv.appendChild(img);
+    prizeDiv.appendChild(span);
+}
+
+
+
+function title(msg){
+    let index = 0;
+    let colors = [
+        "#15616D",
+        "#6D1515",
+        "#6D4515"
+    ];
+
+    for(let i=0;i<msg.owners.length;i++){
+        if(msg.owners[i] == msg.about){
+            index = i;
+        }
+    }
+
+    var titleDiv;
+    var img = document.createElement("img");
+    var span = document.createElement("span");
+
+    img.src = "../../assets/rectP" + index + ".svg";
+    img.style.width = "60px";
+    img.style.width = "69px";
+
+    span.classList.add("material-symbols-outlined");
+    span.style.color = colors[index];
+    span.style.fontSize = "30px"
+
+    if(msg.msg[0] == "PZ"){
+        titleDiv = document.getElementById("title1");
+        span.innerHTML = "token";
+    }
+    else if(msg.msg[0] == "CITY"){
+        titleDiv = document.getElementById("title2");
+        span.innerHTML = "fort";
+    }
+    else if(msg.msg[0] == "FOREST"){
+        titleDiv = document.getElementById("title3");
+        span.innerHTML = "forest";
+    }
+    else if(msg.msg[0] == "CARD"){
+        titleDiv = document.getElementById("title4");
+        span.innerHTML = "style";
+    }
+    else if(msg.msg[0] == "SYMBOLS"){
+        titleDiv = document.getElementById("title5");
+        span.innerHTML = "emergency";
+    }
+
+    titleDiv.parentElement.style.cursor = "inherit";
+    titleDiv.innerHTML = "";
+    titleDiv.appendChild(img);
+    titleDiv.appendChild(span);
+}
 
 function updateCardConstainer(){
     let value = selectPlayer.value;
@@ -597,6 +965,7 @@ function updateCardConstainer(){
                 //cardsContainer.removeChild(img);
                 
                 sendToServer("USE_CARD", [cardsTab[i].index])
+                planetRefresh()
                 //cardsTab.splice(i, 1);
             });
 
@@ -707,5 +1076,31 @@ function updateOthers(){
         }
 
         oceanDiv.appendChild(span);
+    }
+}
+
+function updateColors(user){
+    let colors = [
+        "#00DCFF",
+        "#ff2300",
+        "#ca5800"
+    ];
+
+    let colors2 = [
+        "#05414D",
+        "#991100",
+        "#6a2800"
+    ]
+
+
+    for(let i=0;i<user.length;i++){
+        if(user[i] == playerName){
+            document.getElementById("mainPlayer").style.color = colors[i];
+            document.getElementsByClassName("topbar")[0].style.boxShadow = "0px 3px 10px " + colors[i] ;
+        }else{
+            let div = document.getElementById("playerName" + user[i]).parentElement;
+            div.style.backgroundColor = colors2[i];
+            div.parentElement.style.backgroundColor = colors[i];
+        }
     }
 }

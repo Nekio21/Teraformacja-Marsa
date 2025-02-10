@@ -32,6 +32,16 @@ public class Resources implements Serializable {
     @JsonProperty("titanium")
     private int titanium;
 
+    @JsonProperty("metaltg")
+    private int metalToGold;
+    @JsonProperty("titaniumtg")
+    private int titaniumToGold;
+    @JsonProperty("plantstf")
+    private int plantsToForest;
+
+    @JsonProperty("heattt")
+    private int heatToTemp;
+
     public Resources() {
         this.goldProd = 1;
         this.gold = 25;
@@ -45,6 +55,10 @@ public class Resources implements Serializable {
         this.plants = 0;
         this.titaniumProd = 1;
         this.titanium = 0;
+        this.metalToGold = 2;
+        this.titaniumToGold = 3;
+        this.plantsToForest = 8;
+        this.heatToTemp = 8;
     }
 
     public Resources(int goldProd, int gold, int energyProd, int energy, int heatProd, int heat, int metalProd, int metal, int plantsProd, int plants, int titaniumProd, int titanium) {
@@ -226,6 +240,38 @@ public class Resources implements Serializable {
 
     public void setTitanium(int titanium) {
         this.titanium = titanium;
+    }
+
+    public int getMetalToGold() {
+        return metalToGold;
+    }
+
+    public void setMetalToGold(int metalToGold) {
+        this.metalToGold = metalToGold;
+    }
+
+    public int getTitaniumToGold() {
+        return titaniumToGold;
+    }
+
+    public void setTitaniumToGold(int titaniumToGold) {
+        this.titaniumToGold = titaniumToGold;
+    }
+
+    public int getPlantsToForest() {
+        return plantsToForest;
+    }
+
+    public void setPlantsToForest(int plantsToForest) {
+        this.plantsToForest = plantsToForest;
+    }
+
+    public int getHeatToTemp() {
+        return heatToTemp;
+    }
+
+    public void setHeatToTemp(int heatToTemp) {
+        this.heatToTemp = heatToTemp;
     }
 
     @Override

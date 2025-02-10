@@ -16,9 +16,6 @@ public class CardSkills {
         METAL_PROD, METAL,
         PLANTS_PROD, PLANTS,
         TITANIUM_PROD, TITANIUM,
-
-        CITY,
-        FOREST,
         OCEAN,
         TEMP,
         OXYGEN,
