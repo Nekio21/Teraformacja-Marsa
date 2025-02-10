@@ -639,6 +639,18 @@ function makePlanet(){
             else if(planet[w]=="TREE_P3"){
                 img.src = "../../assets/rectTreeP3.svg";  
             }
+            else if(planet[w]=="OCEAN"){
+                img.src = "../../assets/oceanIcon.svg";
+            }
+            else if(planet[w]=="CITY_P1"){
+                img.src = "../../assets/rectCityP1.svg";
+            }
+            else if(planet[w]=="CITY_P2"){
+                img.src = "../../assets/rectCityP2.svg"; 
+            }
+            else if(planet[w]=="CITY_P3"){
+                img.src = "../../assets/rectCityP3.svg";  
+            }
 
             span.innerHTML = w;
             
@@ -765,7 +777,7 @@ document.getElementById("ps1").addEventListener("click", function(){
 
 document.getElementById("ps2").addEventListener("click", function(){
     if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
-        sendToServer("BOARD_WATER", []);
+        sendToServer("BOARD_OCEAN", []);
     }
 });
 

@@ -41,9 +41,9 @@ public class Board {
     private static void getBoardTFCity(List<Area> newBoard, List<Area> board){
         for(int i=0;i<board.size();i++){
             if(board.get(i) == Area.NOTHING){
-                newBoard.set(i, Area.TRUE);
+                newBoard.add( Area.TRUE);
             }else{
-                newBoard.set(i, Area.FALSE);
+                newBoard.add(Area.FALSE);
             }
         }
 

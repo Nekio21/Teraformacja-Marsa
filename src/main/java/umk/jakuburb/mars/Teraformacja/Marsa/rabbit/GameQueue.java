@@ -219,7 +219,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             error1 = winningPoints.put(CardSkills.Resource.TEMP,1, true, pz);
             error2 = resources.put(CardSkills.Resource.GOLD, 14, false);
         }else if(msg.getMsg().get(0).equals("ENERGY")){
-            error1 = resources.put(CardSkills.Resource.ENERGY_PROD, 11, true);
+            error1 = resources.put(CardSkills.Resource.ENERGY_PROD, 1, true);
             error2 = resources.put(CardSkills.Resource.GOLD, 14, false);
         }else{
             return Error.DEFAULT;

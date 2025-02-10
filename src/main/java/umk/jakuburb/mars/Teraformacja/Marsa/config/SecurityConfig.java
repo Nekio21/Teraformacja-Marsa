@@ -27,6 +27,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(e->
                 e.requestMatchers("/mars/login").anonymous()
                     .requestMatchers("/mars/login/fail").anonymous()
+                    .requestMatchers("/mars/register").anonymous()
                     .requestMatchers("/mars/login/check").anonymous()
                     .requestMatchers("/css/**", "/js/**", "/assets/**").permitAll()
                         .anyRequest().authenticated()
