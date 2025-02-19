@@ -203,6 +203,10 @@ async function startWS(){
 					main.style.display = 'flex';
 					cards.style.display = 'none';
 
+                }else if(msg.msg[0] == "END_GAME"){
+                    main.style.display = 'none';
+					cards.style.display = 'none';
+                    document.getElementById("endGame").style.display = "flex";
                 }
             }
             else if(msg.messageType == "MAIN_CARDS"){   
@@ -392,16 +396,41 @@ async function startWS(){
             else if(msg.messageType == "PRIZE"){
                 prize(msg)
             }
+            else if(msg.messageType == "END_GAME_SCORE"){
+                endGameScore(msg);
+            }
+            else if(msg.messageType == "PING"){
+                console.log("ping");
+            }
             else if(msg.messageType == "ERROR"){
-                if(msg.error == "NO_YOUR_MOVE"){
-                    alert("Nie twój ruch")
+                if(msg.error == "MONEY"){
+                    document.getElementById("errorDiv").innerHTML = "za mało pieniedzy";
                 }
-                else if(msg.error == "MONEY"){
-                    alert("za mało pieniedzy");
+                else if(msg.error == "NO_YOUR_MOVE"){
+                     document.getElementById("errorDiv").innerHTML = "nie twój ruch";
+                }
+                else if(msg.error == "AREA_OCCUPIED"){
+                     document.getElementById("errorDiv").innerHTML = "miejsce jest zajęte";
+                }
+                else if(msg.error == "NO_MORE_TITLE"){
+                document.getElementById("errorDiv").innerHTML = "wyczerpane tytuły";
+                }
+                else if(msg.error == "TITLE"){
+                    document.getElementById("errorDiv").innerHTML = "problem z tytułami";
+                }
+                else if(msg.error == "OCCUPIED"){
+                    document.getElementById("errorDiv").innerHTML = "już zajęte";
+                }
+                else if(msg.error == "NO_MORE_PRIZE"){
+                    document.getElementById("errorDiv").innerHTML = "brak więcej nagród";
+                }
+                else if(msg.error == "CITY"){
+                    document.getElementById("errorDiv").innerHTML = "problem z miastem";
                 }
                 else{
-                    alert("błąd");
+                    document.getElementById("errorDiv").innerHTML = msg.error;
                 }
+                setTimeout( function() { document.getElementById("errorDiv").innerHTML = "" }, 1000);
             }
             
 //			else if(msg.messageType == "CARDS10"){
@@ -413,6 +442,7 @@ async function startWS(){
 
     var error_callback = function(error){
         console.log(error);
+        startWS();
     }
 
     client.connect('guest', 'guest', on_connect, error_callback, '/');
@@ -534,6 +564,60 @@ function updatePlayers(){
             cardUsedBlue.set(namesOther[i], []);
         }
     }
+}
+
+function endGameScore(msg){
+    let endGameDiv = document.getElementById("endGame");
+    endGameDiv.innerHTML = "";
+
+    let table = document.createElement("table");
+    let text = [
+        "poziom gracza",
+        "pkt. z kart",
+        "tytuły",
+        "nagrody",
+        "pkt. za lasy",
+        "pkt. za miasta przy lasach",
+        "suma"
+    ];
+
+    let tr = document.createElement("tr");
+        let td1 = document.createElement("td");
+        let td2 = document.createElement("td");
+        let td3 = document.createElement("td");
+        let td4 = document.createElement("td");
+
+        td1.innerHTML = "gracze";
+        td2.innerHTML = msg.owners[0];
+        td3.innerHTML = msg.owners[1];
+        td4.innerHTML = msg.owners[2];
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        table.appendChild(tr);
+
+    for(let i=0;i<msg.dataListLong[0].length; i++){
+        let tr = document.createElement("tr");
+        let td1 = document.createElement("td");
+        let td2 = document.createElement("td");
+        let td3 = document.createElement("td");
+        let td4 = document.createElement("td");
+
+        td1.innerHTML = text[i];
+        td2.innerHTML = msg.dataListLong[0][i];
+        td3.innerHTML = msg.dataListLong[1][i];
+        td4.innerHTML = msg.dataListLong[2][i];
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        table.appendChild(tr);
+    }
+
+    endGameDiv.appendChild(table);
 }
 
 function planetTree(tab){
@@ -864,7 +948,7 @@ function prize(msg){
 
     for(let i=0;i<msg.owners.length;i++){
         if(msg.owners[i] == msg.about){
-            index = i+1;
+            index = i;
         }
     }
 

@@ -3,18 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="../../css/login.css">
 </head>
-<body>
+<body style="background-image: linear-gradient(50deg, #000,95%, #c47033)">
 
-    <h1>
-        HOME PAGE[<span th:text="${name}"></span>]
-    </h1>
+    <div class="information">
+        <span th:text="${name}"></span>
+        <form th:action="@{/mars/logout}" method="post" id="form">
+            <span class="material-symbols-outlined click" onClick="submit()">
+                logout
+            </span>
+        </form>
+    </div>
 
-    <a th:href="@{/mars/lobby/create}">create lobby</a>
+    <div class="flex">
+        <a th:href="@{/mars/lobby/create}" class="button">
+            <span class="material-symbols-outlined">
+                draw_collage
+            </span>
+            <span>Stwórz lobby</span>
+        </a>
+        <div class="button">
+            <span class="material-symbols-outlined">
+                join_right
+            </span>
+            <form th:action="@{/mars/lobby/join}" method="post">
+                <input type="text" name="code"/>
+                <input type="submit" value="dołącz do lobby" />
+            </form>
+        </div>
+    </div>
 
-    <form th:action="@{/mars/lobby/join}" method="post">
-        <input type="text" name="code"/>
-        <input type="submit" value="join lobby" />
-    </form>
+
+    <script>
+        function submit(){
+            document.getElementById('form').submit()
+        }
+</script>
 </body>
 </html>

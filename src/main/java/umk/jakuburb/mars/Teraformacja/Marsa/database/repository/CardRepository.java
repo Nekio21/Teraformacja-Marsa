@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.Card;
+import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.Resources;
 
 import java.util.List;
 
@@ -24,4 +26,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     @Query("SELECT c FROM Card c WHERE c.id = :id")
     Card getCard(@Param("id")Long ids);
+
+    @Query("SELECT c.symbolList FROM Card c WHERE c.id = :ids")
+    List<Card.Symbol> getSymbols(@Param("ids") List<Long> ids);
 }

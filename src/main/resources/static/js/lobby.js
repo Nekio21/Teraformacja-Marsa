@@ -35,16 +35,22 @@ async function startWS(){
 
                     nameSpan.innerHTML = msg.msg[0];
 
+                    newDiv.classList.add("flex");
+                    newDiv.id = "p" + msg.msg[0];
+
                     newDiv.appendChild(circle);
                     newDiv.appendChild(nameSpan);
                     playersDiv.appendChild(newDiv);
                 }
             }
+            else if(msg.messageType == "LOBBY_QUIT"){
+                window.location.replace(window.location.href + "/return");
+            }
             else if(msg.messageType == "USER_OUT"){
-                let userSpan = document.getElementById(msg.msg[0]);
+                let userSpan = document.getElementById("p" + msg.msg[0]);
 
                 if(userSpan != null){
-                    players.remove(userSpan);
+                    playersDiv.removeChild(userSpan);
                 }
             }
             else if(msg.messageType == "USER_ACTIVE"){
@@ -56,11 +62,13 @@ async function startWS(){
                 circle.style["background-color"] = "#f00";
             }
             else if(msg.messageType == "GAME_CREATED"){
-                let newA = document.createElement("a");
-                newA.href = window.location.origin + msg.msg[0];
-                newA.innerHTML = "wejdz do gry :D";
+                //let newA = document.createElement("a");
+                //newA.href = window.location.origin + msg.msg[0];
 
-                document.body.appendChild(newA);
+                window.location.replace(window.location.origin + msg.msg[0]);
+                //newA.innerHTML = "wejdz do gry :D";
+
+                //document.body.appendChild(newA);
             }
         });
     }

@@ -110,6 +110,11 @@ public abstract class CoreQueue {
         rabbitAdmin.declareBinding(binding);
     }
 
+    public void deleteBinding(FanoutExchange exchange){
+        Binding binding = BindingBuilder.bind(queuePreSUB).to(exchange);
+        rabbitAdmin.removeBinding(binding);
+    }
+
     public void createBinding(DirectExchange exchange, String key){
         Binding binding = BindingBuilder.bind(queuePreSUB).to(exchange).with(key);
         rabbitAdmin.declareBinding(binding);

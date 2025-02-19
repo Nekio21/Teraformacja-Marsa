@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Mars[loginPage]</title>
+
+    <link rel="stylesheet" href="../../css/login.css">
 </head>
 <body>
-    <form th:action="@{/mars/login/check}" method="post">
 
-        <input type="text" name="login"/>
-        <input type="password" name="passwd"/>
+    <div class="flex">
+        <form th:action="@{/mars/login/check}" method="post">
+            <h1>Terraformacja Marsa</h1>
+            <input type="text" name="login"/>
+            <input type="password" name="passwd"/>
 
-        <input type="submit" value="zaloguj się :)" />
-    </form>
-
-    <div>
-        <a th:href="@{/mars/register}">zajestrój się</a>
+            <input type="submit" value="Zaloguj się" />
+        </form>
     </div>
 
-    <div th:if="${c}"> Udało się zarejstrować !!!</div>
+    <div class="register">
+        <a th:href="@{/mars/register}">zajestruj się</a>
+    </div>
+
+    <div th:if="${c}" class="success"> Udało się zarejstrować !!!</div>
 </body>
 </html>

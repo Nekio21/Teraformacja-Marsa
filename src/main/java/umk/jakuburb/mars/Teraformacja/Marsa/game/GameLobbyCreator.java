@@ -56,6 +56,9 @@ public class GameLobbyCreator extends Creator{
 
         return null;
     }
+    public void deleteExchange(String name){
+        rabbitAdmin.deleteExchange(name);
+    }
 
     @Override
     protected void save(NeedURL nurl) {

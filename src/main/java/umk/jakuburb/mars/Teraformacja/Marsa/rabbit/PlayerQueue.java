@@ -36,6 +36,8 @@ public class PlayerQueue extends CoreQueue{
         addReceiveFunction(MessageType.USER_IN, this::dontTouch);
         addReceiveFunction(MessageType.USER_OUT, this::dontTouch);
 
+        addReceiveFunction(MessageType.LOBBY_QUIT, this::dontTouchNotMe);
+
         addSendFunction(MessageType.USER_ACTIVE, this::userActiveSend);
         addSendFunction(MessageType.USER_INACTIVE, this::userInactiveSend);
 
@@ -243,11 +245,23 @@ public class PlayerQueue extends CoreQueue{
         rabbitTemplate.convertAndSend(addressMap.get(Adress.PLAYERS), "", message);
     }
 
-    private void sendIAmOut(MyMessage send){
+    public void sendIAmOut(MyMessage send){
         MyMessage message = new MyMessage();
 
         message.setFrom(uniqName);
         message.setMessageType(MessageType.USER_OUT);
+        message.setMsg(List.of(uniqName));
+
+        //rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),  message);
+        rabbitTemplate.convertAndSend(addressMap.get(Adress.PLAYERS), "", message);
+    }
+
+    public void sendLobbyQuit(){
+        MyMessage message = new MyMessage();
+
+        message.setFrom(uniqName);
+        message.setAbout(uniqName);
+        message.setMessageType(MessageType.LOBBY_QUIT);
         message.setMsg(List.of(uniqName));
 
         //rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),  message);
@@ -359,6 +373,17 @@ public class PlayerQueue extends CoreQueue{
         }
 
         return null;
+    }
+
+    private MyMessage dontTouchNotMe(MyMessage message){
+        if(message.getAbout().equals(uniqName)){
+            MyMessage newM = new MyMessage();
+            newM.setAbout(uniqName);
+            newM.setMessageType(MessageType.PING);
+            return newM;
+        }
+
+        return message;
     }
 
     @Override

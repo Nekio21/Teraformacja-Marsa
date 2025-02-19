@@ -40,6 +40,11 @@ public class SecurityConfig {
                             .defaultSuccessUrl("/mars/home", true)
                             .failureUrl("/mars/login/fail")
         )
+                .logout(l->
+                        l.invalidateHttpSession(true)
+                                .logoutUrl("/mars/logout")
+                                .logoutSuccessUrl("/mars/login")
+                )
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

@@ -75,6 +75,8 @@ public class GameController {
         GameQueue gameQueue = (GameQueue) gameCreator.createExchange(gameURL);
         gameQueue.initGameData(lobby.get().getPlayers().stream().map(Player::getLogin).toList());
 
+        lobbyRepository.delete(lobby.get());
+
         mySession.getPlayerQueue().sendGameCreated("/mars/game/" + gameURL);
 
         return "redirect:/mars/game/" + gameURL;

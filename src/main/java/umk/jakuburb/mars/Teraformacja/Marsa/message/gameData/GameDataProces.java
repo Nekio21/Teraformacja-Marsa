@@ -10,12 +10,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills.Resource.PZ;
 
 public class GameDataProces {
 
-    public static Error useCard(String user, Card card, GameData gameData){
+    public static Error useCard(String user, Card card, GameData gameData, Consumer<CardSkills.Resource> func){
         Resources resources = gameData.getResources().get(user);
         WinningPoints winningPoints = gameData.getWinningPoints();
 
@@ -29,16 +31,14 @@ public class GameDataProces {
         pz.set(0);
 
         for(CardSkills cs: card.getCardSkillsList()){
-            boolean plus = cs.getMove()!=CardSkills.Move.LOOSE;
-            Error error1 = resources.put(cs.getResource(), cs.getAmount(), plus);
-            Error error2 = winningPoints.put(cs.getResource(), cs.getAmount(), plus, pz);
+            if(cs.getWhenUse() == null) {
+                boolean plus = cs.getMove() != CardSkills.Move.LOOSE;
+                Error error1 = resources.put(cs.getResource(), cs.getAmount(), plus);
+                Error error2 = winningPoints.put(cs.getResource(), cs.getAmount(), plus, pz);
 
-            if(cs.getResource() == PZ){
-                pz.set(pz.get() + 1);
-            }
-
-            if(error1 != Error.NO_ERROR && error2 != Error.NO_ERROR){
-                return error;
+                if (error1 != Error.NO_ERROR && error2 != Error.NO_ERROR) {
+                    return error;
+                }
             }
         }
 
@@ -59,6 +59,10 @@ public class GameDataProces {
             List<Long> list = gameData.getUsedCardRed().get(user);
             list.add(card.getId());
             gameData.getUsedCardRed().put(user, list);
+        }
+
+        for(CardSkills cs: card.getCardSkillsList()){
+            func.accept(cs.getResource());
         }
 
         gameData.getResources().put(user, resources);

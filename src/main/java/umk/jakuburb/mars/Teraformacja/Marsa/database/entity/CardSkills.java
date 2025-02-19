@@ -20,9 +20,10 @@ public class CardSkills {
         TEMP,
         OXYGEN,
         CARD,
-        PZ
+        PZ,
+        CITY,
+        TREE
     }
-
     @Id
     @SequenceGenerator(name="sekwencja6", sequenceName = "card_skills_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "sekwencja6")
@@ -37,6 +38,8 @@ public class CardSkills {
 
     private Resource resource;
     private int amount;
+
+    private Resource whenUse;
 
     public CardSkills() {
     }
@@ -55,11 +58,28 @@ public class CardSkills {
         this.amount = amount;
     }
 
+
     public CardSkills(Card card, Move move, Resource resource, int amount) {
         this.card = card;
         this.move = move;
         this.resource = resource;
         this.amount = amount;
+    }
+
+    public CardSkills(Long id, Card card, Move move, Resource resource, int amount, Resource whenUse) {
+        this.id = id;
+        this.card = card;
+        this.move = move;
+        this.resource = resource;
+        this.amount = amount;
+        this.whenUse = whenUse;
+    }
+
+    public CardSkills(Move move, Resource resource, int amount, Resource whenUse) {
+        this.move = move;
+        this.resource = resource;
+        this.amount = amount;
+        this.whenUse = whenUse;
     }
 
     public Long getId() {
@@ -100,5 +120,13 @@ public class CardSkills {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public Resource getWhenUse() {
+        return whenUse;
+    }
+
+    public void setWhenUse(Resource whenUSe) {
+        this.whenUse = whenUse;
     }
 }

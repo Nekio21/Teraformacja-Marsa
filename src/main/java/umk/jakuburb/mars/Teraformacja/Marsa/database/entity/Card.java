@@ -11,6 +11,10 @@ public class Card {
         MAIN, BLUE, GREEN, RED
     }
 
+    public enum Symbol{
+        LEAF, METAL, ATOM, CITY, ACTION, EARTH, STAR, MARS, ENERGY, BEAR, BACTERIA
+    }
+
     @Id
     @SequenceGenerator(name="sekwencja4", sequenceName = "card_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "sekwencja4")
@@ -25,6 +29,8 @@ public class Card {
 
     @OneToMany(mappedBy = "card", fetch=FetchType.EAGER)
     private List<CardSkills> cardSkillsList;
+
+    private List<Symbol> symbolList;
 
     public Card() {
     }
@@ -54,6 +60,15 @@ public class Card {
         this.typeCard = typeCard;
         this.image = image;
         this.price = price;
+    }
+
+    public Card(Long id, TypeCard typeCard, int price, byte[] image, List<CardSkills> cardSkillsList, List<Symbol> symbolList) {
+        this.id = id;
+        this.typeCard = typeCard;
+        this.price = price;
+        this.image = image;
+        this.cardSkillsList = cardSkillsList;
+        this.symbolList = symbolList;
     }
 
     public Long getId() {
@@ -94,5 +109,13 @@ public class Card {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public List<Symbol> getSymbolList() {
+        return symbolList;
+    }
+
+    public void setSymbolList(List<Symbol> symbolList) {
+        this.symbolList = symbolList;
     }
 }

@@ -1,9 +1,12 @@
 package umk.jakuburb.mars.Teraformacja.Marsa.message;
 
 import org.springframework.security.core.parameters.P;
+import umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameData;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static umk.jakuburb.mars.Teraformacja.Marsa.message.Area.*;
 
 public class Board {
 
@@ -29,6 +32,26 @@ public class Board {
         }
 
         return boardToSend;
+    }
+
+    public static Long getCityAroundPZ(Area city, List<Area> board){
+        long score = 0L;
+
+        for(int i=0;i<board.size();i++){
+            if(board.get(i) == city){
+                List<Integer> list = areasAround(i);
+                for (int j=0;j<list.size();j++){
+                    if(board.get(list.get(j)) == TREE_P1
+                            || board.get(list.get(j)) == TREE_P2
+                            || board.get(list.get(j)) == TREE_P3
+                    ){
+                        score++;
+                    }
+                }
+            }
+        }
+
+        return score;
     }
 
     private static void getBoardTFOcean(List<Area> newBoard, List<Area> board){
@@ -185,5 +208,39 @@ public class Board {
         }
 
         return -1;
+    }
+
+    public static Area getTree(GameData gameDate, String user){
+        int index = gameDate.getPlayers().indexOf(user);
+        Area tree;
+
+        if(index == 0){
+            tree = TREE_P1;
+        }else if(index == 1){
+            tree = TREE_P2;
+        }else if(index == 2){
+            tree = TREE_P3;
+        }else{
+            tree = null;
+        }
+
+        return tree;
+    }
+
+    public static Area getCity(GameData gameDate, String user){
+        int index = gameDate.getPlayers().indexOf(user);
+        Area city;
+
+        if(index == 0){
+            city = CITY_P1;
+        }else if(index == 1){
+            city = CITY_P2;
+        }else if(index == 2){
+            city = CITY_P3;
+        }else{
+            city = null;
+        }
+
+        return city;
     }
 }

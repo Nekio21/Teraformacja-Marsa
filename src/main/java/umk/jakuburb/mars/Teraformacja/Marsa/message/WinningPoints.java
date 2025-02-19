@@ -1,17 +1,24 @@
 package umk.jakuburb.mars.Teraformacja.Marsa.message;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class WinningPoints implements Serializable {
+    @JsonProperty("temp")
     private int temp;
+    @JsonProperty("ocean")
     private int ocean;
+    @JsonProperty("oxygen")
     private int oxygen;
 
+    @JsonProperty("winTemp")
     private int winTemp;
+    @JsonProperty("winOxygen")
     private int winOxygen;
+    @JsonProperty("winOcean")
     private int winOcean;
 
     public WinningPoints() {
@@ -73,6 +80,21 @@ public class WinningPoints implements Serializable {
             }
         }
         return Error.NO_ERROR;
+    }
+
+    public boolean winBool(){
+
+        if(temp < winTemp){
+            return false;
+        }
+        else if(ocean < winOcean){
+            return false;
+        }
+        else if(oxygen < winOxygen){
+            return false;
+        }
+
+        return true;
     }
 
     public int getTemp() {

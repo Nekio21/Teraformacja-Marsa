@@ -3,37 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Lobby</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <script src="../../js/stomp.js"></script>
     <link rel="stylesheet" href="../../css/lobby.css">
 </head>
 <body>
 
-    <h1>
-        Twoje imie: <span th:text="${nickname}"></span>
-    </h1>
-    <h2>
-        Host: <span th:text="${host}"></span>
-    </h2>
-    <h3>
-        Code: <span th:text="${code}"></span>
-    </h3>
+    <div class="flex direct fullHeight">
+        <h1>
+            Code: <span th:text="${code}"></span>
+        </h1>
+        <h2>
+            Host: <span th:text="${host}"></span>
+        </h2>
 
-
-    <div>
-        Uzytkownicy:
-        <div id="players" th:each="p: ${players}">
-            <div>
-                <span th:id="'circle' + ${p}" class="activeCircle"></span>
-                <span th:text="${p}" th:id="${p}"></span>
+        <div class="flex minHeight">
+            <div id="players" >
+                <div class="flex" th:each="p: ${players}">
+                    <span th:id="'circle' + ${p}" class="activeCircle"></span>
+                    <span th:text="${p}" th:id="${p}"></span>
+                </div>
             </div>
         </div>
+
+
+        <a th:if="${ishost} == true" th:href="@{${link}}">Zacznij gre</a>
+        <span th:if="${ishost} == false">Zaczekaj, aż host uruchomi gre :D</span>
     </div>
 
-    <a th:if="${ishost} == true" th:href="@{${link}}">Zacznij :)</a>
-    <span th:if="${ishost} == false">Zaczekaj, aż host uruchomi gre :D</span>
+    <form th:action="@{/mars/lobby/logout}" method="post" id="form2">
+            <span class="material-symbols-outlined click" onClick="submit()">
+                logout
+            </span>
+    </form>
 
-    <a>Wyjdz z lobby :(</a>
+    <script>
+        function submit(){
+            document.getElementById('form2').submit()
+        }
+    </script>
 
     <script th:inline="javascript">
         /*<![CDATA[*/

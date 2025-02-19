@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static umk.jakuburb.mars.Teraformacja.Marsa.database.entity.CardSkills.Resource.PZ;
 import static umk.jakuburb.mars.Teraformacja.Marsa.message.Area.*;
 import static umk.jakuburb.mars.Teraformacja.Marsa.message.MessageType.*;
 import static umk.jakuburb.mars.Teraformacja.Marsa.message.gameData.GameDataProces.check;
@@ -43,6 +45,9 @@ public class GameQueue extends GameCoreQueue implements Timerable {
     private int whoPlay = 0;
     private GameState gameState = GameState.WAITING;
 
+    private ArrayList<String> prizesNames = new ArrayList(List.of(
+            "PZ", "GOLD", "LEAF", "ENERGY", "HEAT"
+    ));
 
     //TODO: o bakup nie sie ma co sie martwic bo przeciez dziala fifo
     //wiec jak beda dwa taski: backup, nowa wiadomosc
@@ -197,6 +202,48 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
     private void endGame(){
         System.out.println("endGame");
+        gameState = GameState.END_GAME;
+
+        HashMap<String, Long> prize = countPrize();
+
+        List<List<Long>> pktToSend = new ArrayList<>();
+
+        for(String user: gameDate.getPlayers()){
+            long pkt = 0L;
+
+            long level = gameDate.getLevel().get(user);
+            long cardPz = endGameCardPkt(user);
+
+            Area tree = Board.getTree(gameDate, user);
+            long countTree = gameDate.getPlanet().stream().filter(e->e.equals(tree)).count();
+
+            long titles = gameDate.getTitles().values().stream().filter(e->e.equals(user)).count() * 5;
+            long prizes = prize.getOrDefault(user, 0L);
+            Area city = Board.getCity(gameDate, user);
+            long scoreCity = Board.getCityAroundPZ(city, gameDate.getPlanet());
+
+            pkt = level + cardPz + countTree + titles + prizes + scoreCity;
+
+            List<Long> list = new ArrayList<>();
+            list.add(level);
+            list.add(cardPz);
+            list.add(titles);
+            list.add(prizes);
+            list.add(countTree);
+            list.add(scoreCity);
+            list.add(pkt);
+
+            pktToSend.add(list);
+        }
+
+        MyMessage message = new MyMessage();
+        message.setFrom(NAME);
+        message.setMessageType(END_GAME_SCORE);
+        message.setOwners(gameDate.getPlayers());
+        message.setDataListLong(pktToSend);
+
+        sendToUsers(message);
+        sendGameState();
     }
 
 
@@ -227,10 +274,14 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
         if(error1 != Error.NO_ERROR){
             return error1;
+        }else{
+            blueCard(CardSkills.Resource.TEMP);
         }
-        else if(error2 != Error.NO_ERROR){
+         if(error2 != Error.NO_ERROR){
             return error2;
-        }
+        }else{
+             blueCard(CardSkills.Resource.ENERGY_PROD);
+         }
 
         gameDate.setWinningPoints(winningPoints);
         gameDate.getResources().put(about, resources);
@@ -263,7 +314,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             return Error.NO_MORE_PRIZE;
         }
 
-        int price = (int)gameDate.getPrize().values().stream().count() * 8;
+        int price = ((int)gameDate.getPrize().values().stream().count() +1) * 8;
 
         Resources resources = gameDate.getResources().get(about);
         Error error = resources.put(CardSkills.Resource.GOLD, price, false);
@@ -272,15 +323,11 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             return error;
         }
 
-        ArrayList tab = new ArrayList(List.of(
-                "PZ", "GOLD", "LEAF", "ENERGY", "HEAT"
-        ));
-
         if(gameDate.getPrize().get(msg.getMsg().get(0)) != null){
             return Error.OCCUPIED;
         }
 
-        if(!tab.contains(msg.getMsg().get(0))){
+        if(!prizesNames.contains(msg.getMsg().get(0))){
             return Error.DEFAULT;
         }
 
@@ -402,6 +449,21 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         }
         else if(msg.getMsg().get(0).equals("SYMBOLS")){
 
+            List<Long> ids = new ArrayList<>();
+
+            ids.addAll(gameDate.getUsedCardBlue().get(about));
+            ids.addAll(gameDate.getUsedCardGreen().get(about));
+            ids.addAll(gameDate.getUsedCardRed().get(about));
+
+            List<Card.Symbol> symbolList = cardRepository.getSymbols(ids);
+
+
+
+            if((symbolList.stream().count() >= 15)&&gameDate.getTitles().get("SYMBOLS") == null){
+                gameDate.getTitles().put("SYMBOLS", about);
+            }else {
+                return Error.TITLE;
+            }
         }
         else{
             return Error.DEFAULT;
@@ -586,6 +648,8 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             nextRoundCAS(msg);
         }
 
+        blueCard(CardSkills.Resource.OCEAN);
+
         sendStates();
         sendResources(about);
         sendOthers(about);
@@ -664,6 +728,8 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         else if(gameDate.getUsersState().get(msg.getAbout()) == UserState.SECOND_MOVE){
             nextRoundCAS(msg);
         }
+
+        blueCard(CardSkills.Resource.CITY);
 
         sendStates();
         sendResources(about);
@@ -758,6 +824,11 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             nextRoundCAS(msg);
         }
 
+        blueCard(CardSkills.Resource.TREE);
+        if(pz.get() > 0){
+            blueCard(CardSkills.Resource.OXYGEN);
+        }
+
         sendStates();
         sendResources(about);
         sendOthers(about);
@@ -802,6 +873,8 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             nextRoundCAS(msg);
         }
 
+        blueCard(CardSkills.Resource.TEMP);
+
         sendStates();
         sendResources(about);
         sendOthers(about);
@@ -810,6 +883,35 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         return Error.NO_ERROR;
     }
 
+
+    private void blueCard(CardSkills.Resource when){
+        List<String> users = gameDate.getPlayers();
+
+        for(String user: users) {
+            List<Long> list = gameDate.getUsedCardBlue().get(user);
+
+            List<Card> cardList = cardRepository.getCards(list);
+
+            Resources resources = gameDate.getResources().get(user);
+            WinningPoints winningPoints = gameDate.getWinningPoints();
+
+            AtomicInteger pz = new AtomicInteger();
+            pz.set(0);
+
+            for (Card c : cardList) {
+                for (CardSkills s : c.getCardSkillsList()) {
+                    if(when == s.getWhenUse()) {
+                        resources.put(s.getResource(), s.getAmount(), s.getMove() != CardSkills.Move.LOOSE);
+                        winningPoints.put(s.getResource(), s.getAmount(), s.getMove() != CardSkills.Move.LOOSE, pz);
+                    }
+                }
+            }
+
+            gameDate.getResources().put(user, resources);
+            gameDate.setWinningPoints(winningPoints);
+            gameDate.getLevel().put(user, gameDate.getLevel().get(user) + pz.get());
+        }
+    }
 
     public Error useCardCAS(MyMessage msg){
         String about = msg.getAbout();
@@ -821,7 +923,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         msg.setAbout(msg.getFrom());
         List<Card> list = cardRepository.getCards(List.of(Long.valueOf(msg.getMsg().get(0))));
 
-        Error error = useCard(about, list.get(0), gameDate);
+        Error error = useCard(about, list.get(0), gameDate, this::blueCard);
 
         if(error != Error.NO_ERROR){
             return error;
@@ -875,7 +977,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             Card card = cardRepository.getCard(Long.valueOf(message.getMsg().get(0)));
             gameDate.getMainCards().put(from, Long.valueOf(message.getMsg().get(0)));
 
-            GameDataProces.useCard(from, card, gameDate);
+            GameDataProces.useCard(from, card, gameDate, this::blueCard);
 
             gameDate.getUsersState().put(message.getAbout(), UserState.CHOSE_CARD);
 
@@ -979,7 +1081,8 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         List<Card> cardsList = cardRepository.getRandomCards(drawCards, amount);
 
         if(cardsList.size() != amount){
-            sendErrorMessage(user, Error.NO_MORE_CARD);
+            //sendErrorMessage(user, Error.NO_MORE_CARD);
+            endGame();
             return;
         }
 
@@ -1097,6 +1200,14 @@ public class GameQueue extends GameCoreQueue implements Timerable {
                 message.setAbout(gameDate.getPlayers().get(whoPlay));
                 nextRoundCAS(message);
             }
+
+            if(gameDate.getWinningPoints().winBool()){
+                endGame();
+            }
+        }else{
+            MyMessage message = new MyMessage();
+            message.setMessageType(PING);
+            sendToUsers(message);
         }
     }
 
@@ -1115,6 +1226,95 @@ public class GameQueue extends GameCoreQueue implements Timerable {
     public boolean checkAndSaveDefaultTrue(MyMessage message){
         return true;
     }
+
+    private Long endGameCardPkt(String user){
+        List<Long> list = gameDate.getUsedCardGreen().get(user);
+        List<Card> cards = cardRepository.getCards(list);
+
+        long pzFromCard = 0L;
+        for(Card c: cards){
+            for(CardSkills cs: c.getCardSkillsList()){
+                if(cs.getResource()==PZ){
+                    pzFromCard += cs.getAmount();
+                }
+            }
+        }
+
+        return pzFromCard;
+    }
+
+    private HashMap<String, Long> countPrize(){
+        HashMap<String, Boolean> prizes = gameDate.getPrize();
+        HashMap<String, Long> usersPkt = new HashMap<>();
+
+        for(String names: prizesNames) {
+            if(prizes.getOrDefault(names, false) == true){
+                switch (names){
+                    case "PZ":
+                        countPrizeSaver(usersPkt, gameDate.getLevel());
+                        break;
+                    case "GOLD":
+                        HashMap<String, Long> resourceGold = new HashMap<>();
+
+                        for(String users: gameDate.getPlayers()){
+                            Resources r = gameDate.getResources().get(users);
+                            resourceGold.put(users, (long) r.getGold());
+                        }
+
+                        countPrizeSaver(usersPkt, resourceGold);
+                        break;
+                    case "LEAF":
+                        HashMap<String, Long> resourceLeaf = new HashMap<>();
+
+                        for(String users: gameDate.getPlayers()){
+                            Resources r = gameDate.getResources().get(users);
+                            resourceLeaf.put(users, (long) r.getPlants());
+                        }
+
+                        countPrizeSaver(usersPkt, resourceLeaf);
+                        break;
+                    case "ENERGY":
+                        HashMap<String, Long> resourceEnergy = new HashMap<>();
+
+                        for(String users: gameDate.getPlayers()){
+                            Resources r = gameDate.getResources().get(users);
+                            resourceEnergy.put(users, (long) r.getEnergy());
+                        }
+
+                        countPrizeSaver(usersPkt, resourceEnergy);
+                        break;
+                    case "HEAT":
+                        HashMap<String, Long> resourceHeat = new HashMap<>();
+
+                        for(String users: gameDate.getPlayers()){
+                            Resources r = gameDate.getResources().get(users);
+                            resourceHeat.put(users, (long) r.getHeat());
+                        }
+
+                        countPrizeSaver(usersPkt, resourceHeat);
+                        break;
+                }
+            }
+        }
+
+        return usersPkt;
+    }
+
+    private void countPrizeSaver(HashMap<String, Long> usersPkt, HashMap<String, Long> list){
+        long max = list.values().stream().max(Long::compareTo).get();
+        long min = list.values().stream().min(Long::compareTo).get();
+
+        for(String users: gameDate.getPlayers()){
+            if(max == list.get(users)){
+                usersPkt.put(users, usersPkt.getOrDefault(users, 0L) + 5);
+            }else if(min == list.get(users)){
+                continue;
+            }else{
+                usersPkt.put(users, usersPkt.getOrDefault(users, 0L) + 2);
+            }
+        }
+    }
+
 
     public void monitorUserMove(MyMessage message){
         //wysyła recover

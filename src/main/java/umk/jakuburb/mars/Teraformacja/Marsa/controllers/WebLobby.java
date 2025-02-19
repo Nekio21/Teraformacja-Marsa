@@ -19,6 +19,8 @@ import umk.jakuburb.mars.Teraformacja.Marsa.rabbit.Adress;
 import umk.jakuburb.mars.Teraformacja.Marsa.message.MyMessage;
 import umk.jakuburb.mars.Teraformacja.Marsa.utils.MySession;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -83,6 +85,42 @@ public class WebLobby {
         mySession.getPlayerQueue().sendIAmIn(new MyMessage());
 
         return "lobby";
+    }
+
+    @GetMapping("/{url}/return")
+    public String returnFun(@PathVariable String url){
+        return "redirect:/mars/home";
+    }
+
+    @PostMapping("/logout")
+    public String logout(){
+        Player player = mySession.getPlayer();
+        List<Lobby> list = player.getLobbies();
+
+        player = playerRepository.getReferenceById(player.getId());
+
+        if(list.size() > 0) {
+            Lobby lobby = list.get(0);
+
+            if(player.getId().equals(lobby.getHost().getId())){
+                lobbyRepository.delete(lobby);
+                mySession.getPlayerQueue().sendLobbyQuit();
+                mySession.getPlayerQueue().deleteBinding(new FanoutExchange("Lobby" + lobby.getUrl()));
+                gameLobbyCreator.deleteExchange("Lobby" + lobby.getUrl());
+            }else{
+                List<Player> list2 = new ArrayList<>();
+                for(Player p: lobby.getPlayers()){
+                    if(!p.getId().equals(player.getId()))list2.add(p);
+                }
+
+                lobby.setPlayers(list2);
+                lobbyRepository.save(lobby);
+                mySession.getPlayerQueue().sendIAmOut(new MyMessage());
+                mySession.getPlayerQueue().deleteBinding(new FanoutExchange("Lobby" + lobby.getUrl()));
+            }
+        }
+
+        return "redirect:/mars/home";
     }
 
     @GetMapping("/create")

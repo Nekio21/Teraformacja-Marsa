@@ -21,6 +21,7 @@
 <body>
     <header class="topbar">
         <header th:text="${name}" id="mainPlayer"></header>
+        <section class="errorMessage" id="errorDiv"></section>
         <section>
             <section>
                 <img src="../../assets/gold.png" alt="gold icon" width="30px" height="30px"/>
@@ -186,31 +187,31 @@
                 <section class="infoLeft">
                     <header>Tytuły</header>
                     <section>
-                        <section class="clickFlex" id="title1">
+                        <section class="clickFlex" id="title1" title="Teraformator Marsa">
                             <img src="../../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
                             <span class="material-symbols-outlined">
                                 token
                             </span>
                         </section>
-                        <section class="clickFlex" id="title2">
+                        <section class="clickFlex" id="title2" title="Prezydent Marsa">
                             <img src="../../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
                             <span class="material-symbols-outlined">
                                 fort
                             </span>
                         </section>
-                        <section class="clickFlex" id="title3">
+                        <section class="clickFlex" id="title3" title="Ekolog Marsa">
                             <img src="../../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
                             <span class="material-symbols-outlined">
                                 forest
                                 </span>
                         </section>
-                        <section class="clickFlex" id="title4">
+                        <section class="clickFlex" id="title4" title="Przyszłość Marsa">
                             <img src="../../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
                             <span class="material-symbols-outlined">
                                 style
                             </span>
                         </section>
-                        <section class="clickFlex" id="title5">
+                        <section class="clickFlex" id="title5" title="Symbole Marsa">
                             <img src="../../assets/rect.svg" alt="rect" width="60px" height="69px"/> 
                             <span class="material-symbols-outlined">
                                 emergency
@@ -845,6 +846,10 @@
     </main>
 
     <div id="cards">
+    </div>
+
+    <div id="endGame" style="display: none;">
+        
     </div>
 
     <script th:inline="javascript">

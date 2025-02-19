@@ -335,9 +335,14 @@ body{
     text-align: center;
 
     width: 116px;
-    height: 133px;
+    height: calc(100% - 80px);
 
     cursor:pointer;
+}
+
+.errorMessage{
+    color: #d46;
+    font-size: 18px;
 }
 
 .lastResource{

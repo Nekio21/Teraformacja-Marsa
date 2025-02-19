@@ -66,10 +66,18 @@ public class Loader implements ApplicationRunner {
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 11)
         ));
 
-        saveCard("card1.png",31, Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card2.png", 13,Card.TypeCard.GREEN, new ArrayList<>());
-        saveCard("card3.png", 15,Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card4.png", 15,Card.TypeCard.BLUE, new ArrayList<>());
+        saveCard("card1.png",31, Card.TypeCard.BLUE, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT_PROD, 1, CardSkills.Resource.OCEAN)
+        ));
+        saveCard("card2.png", 38,Card.TypeCard.BLUE, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.ENERGY, 3, CardSkills.Resource.TREE)
+        ));
+        saveCard("card3.png", 21,Card.TypeCard.BLUE, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL, 3, CardSkills.Resource.OXYGEN)
+        ));
+        saveCard("card4.png", 15,Card.TypeCard.BLUE, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 3, CardSkills.Resource.TEMP)
+        ));
         saveCard("card5.png", 22,Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT_PROD, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 2)
@@ -77,9 +85,9 @@ public class Loader implements ApplicationRunner {
         saveCard("card6.png", 12,Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 1)
         ));
-        saveCard("card7.png", 50,Card.TypeCard.GREEN, new ArrayList<>());
-        saveCard("card8.png", 31,Card.TypeCard.BLUE, new ArrayList<>());
-        saveCard("card10.png", 31,Card.TypeCard.BLUE, new ArrayList<>());
+        //saveCard("card7.png", 50,Card.TypeCard.GREEN, new ArrayList<>());
+        //saveCard("card8.png", 31,Card.TypeCard.BLUE, new ArrayList<>());
+        //saveCard("card10.png", 31,Card.TypeCard.BLUE, new ArrayList<>());
 
         saveCard("card11.png", 21, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT_PROD, 2),
@@ -162,6 +170,37 @@ public class Loader implements ApplicationRunner {
         saveCard("card32.png", 27, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 6)
         ));
+        saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
+        ));
+
+        saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
+        ));
+
+        saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
+        ));
+
+        saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
+                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
+        ));
+
+        for(int i=0;i<10;i++) {
+            saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
+            ));
+        }
     }
 
     private void saveMainCard(String name, List<CardSkills> list) throws IOException {

@@ -1,0 +1,150 @@
+*{
+	box-sizing: border-box;
+    margin: 0px;
+}
+
+html{
+    height: 100%;
+    cursor: url("../assets/cursor.svg") 1 1,auto;
+}
+
+
+body{
+   height: 100%;
+    font-family: "Jura", sans-serif;
+    font-optical-sizing: auto;
+
+    background-image: linear-gradient(50deg, #000,65%, #c47033);
+    color: #FBFEFB;
+
+    position: relative;
+    text-decoration:none;
+
+}
+
+
+
+h1{
+    font-size: 72px;
+    font-weight: 700;
+
+    background-image: linear-gradient(#ff7800, #c43333);
+    color: transparent;
+    background-clip: text;
+
+    margin-bottom: 20px;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.flex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100%;
+    width: 100%;
+}
+
+input[type=text], input[type=password] {
+    border: none;
+    border: 2px solid #FBFEFB;
+    background-color: transparent;
+    color: #FBFEFB;
+    padding: 15px 20px;
+    font-size: 18px;
+    width: 450px;
+}
+
+
+input[type=submit]{
+    border: none;
+    background-color: transparent;
+    color: #FBFEFB;
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+input[type=submit]:hover{
+    opacity: 1;
+    cursor: pointer;
+}
+
+.register a{
+    position: absolute;
+    top:20px;
+    right: 20px;
+
+    font-size: 16px;
+    color: #FBFEFB;
+    opacity: 0.7;
+}
+
+a{
+    text-decoration: none;
+    color: #fbfbfb;
+}
+
+.register a:hover{
+    cursor: pointer;
+    opacity: 1;
+}
+
+.success{
+    background-color: #2e4;
+    text-align: center;
+    color: #FBFEFB;
+    font-size: 24px;
+}
+
+.information{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.information > span{
+    margin-left: 15px;
+}
+
+.click{
+    cursor: pointer;
+    opacity:0.7;
+}
+
+.click{
+    opacity:1;
+}
+
+.button{
+    height: 80%;
+    width: 45%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+
+    background-image: linear-gradient(#ff7800, #c43333);
+    color: transparent;
+    background-clip: text;
+}
+
+.button > .material-symbols-outlined{
+    font-size: 240px;
+}
+
+.button > span{
+    text-decoration: none;
+    font-size: 48px;
+}
