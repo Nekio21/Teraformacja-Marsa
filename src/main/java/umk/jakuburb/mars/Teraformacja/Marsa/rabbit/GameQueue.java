@@ -32,6 +32,8 @@ public class GameQueue extends GameCoreQueue implements Timerable {
     private HashMap<MessageType, Function<MyMessage, Error>> checkAndSave;
     private GameData gameDate;
 
+    private RabbitAdmin rabbitAdmin;
+
     private HashMap<String, Boolean> activePlayers;
     private HashMap<String, Long> mainCardToChose;
     private HashMap<String, List<Long>> cardsToChose;
@@ -49,15 +51,11 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             "PZ", "GOLD", "LEAF", "ENERGY", "HEAT"
     ));
 
-    //TODO: o bakup nie sie ma co sie martwic bo przeciez dziala fifo
-    //wiec jak beda dwa taski: backup, nowa wiadomosc
-    //to jak najpierw bedzie backup to zrobi backup i potem doda nowa wiadomosc,
-    //jesli na odwrot to najpierw da nowa wiadomosc, a potem backup, który bedzie juz z ta nowa wiadomoscia
-
     public GameQueue(String uniqName,String playersExchange, RabbitAdmin rabbitAdmin, RabbitTemplate rabbitTemplate) {
         super(uniqName, rabbitAdmin, rabbitTemplate);
 
         gameDate = new GameData();
+        this.rabbitAdmin = rabbitAdmin;
         this.playersExchange = playersExchange;
         drawCards = new ArrayList<>();
         checkAndSave = new HashMap<>();
@@ -244,6 +242,9 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
         sendToUsers(message);
         sendGameState();
+
+        rabbitAdmin.deleteExchange(uniqName);
+        rabbitAdmin.deleteQueue("help.players." + uniqName);
     }
 
 
@@ -314,14 +315,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             return Error.NO_MORE_PRIZE;
         }
 
-        int price = ((int)gameDate.getPrize().values().stream().count() +1) * 8;
 
-        Resources resources = gameDate.getResources().get(about);
-        Error error = resources.put(CardSkills.Resource.GOLD, price, false);
-
-        if(error != Error.NO_ERROR){
-            return error;
-        }
 
         if(gameDate.getPrize().get(msg.getMsg().get(0)) != null){
             return Error.OCCUPIED;
@@ -329,6 +323,15 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
         if(!prizesNames.contains(msg.getMsg().get(0))){
             return Error.DEFAULT;
+        }
+
+        int price = ((int)gameDate.getPrize().values().stream().count() +1) * 8;
+
+        Resources resources = gameDate.getResources().get(about);
+        Error error = resources.put(CardSkills.Resource.GOLD, price, false);
+
+        if(error != Error.NO_ERROR){
+            return error;
         }
 
         gameDate.getPrize().put(msg.getMsg().get(0), true);
@@ -362,14 +365,14 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         }
 
         Resources resources = gameDate.getResources().get(about);
-        Error error = resources.put(CardSkills.Resource.GOLD, 8, false);
-
-        if(error != Error.NO_ERROR){
-            return error;
-        }
 
         if(msg.getMsg().get(0).equals("PZ")){
             if((gameDate.getLevel().get(about) >= 35)&&gameDate.getTitles().get("PZ") == null){
+                Error error = resources.put(CardSkills.Resource.GOLD, 8, false);
+
+                if(error != Error.NO_ERROR){
+                    return error;
+                }
                 gameDate.getTitles().put("PZ", about);
             }else {
                 return Error.TITLE;
@@ -403,6 +406,11 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             }
 
             if(count >= 3){
+                Error error = resources.put(CardSkills.Resource.GOLD, 8, false);
+
+                if(error != Error.NO_ERROR){
+                    return error;
+                }
                 gameDate.getTitles().put("CITY", about);
             }else{
                 return Error.TITLE;
@@ -435,6 +443,11 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             }
 
             if(count >= 3){
+                Error error = resources.put(CardSkills.Resource.GOLD, 8, false);
+
+                if(error != Error.NO_ERROR){
+                    return error;
+                }
                 gameDate.getTitles().put("FOREST", about);
             }else{
                 return Error.TITLE;
@@ -442,6 +455,11 @@ public class GameQueue extends GameCoreQueue implements Timerable {
         }
         else if(msg.getMsg().get(0).equals("CARD")){
             if((gameDate.getCards().get(about).stream().count() >= 15)&&gameDate.getTitles().get("CARD") == null){
+                Error error = resources.put(CardSkills.Resource.GOLD, 8, false);
+
+                if(error != Error.NO_ERROR){
+                    return error;
+                }
                 gameDate.getTitles().put("CARD", about);
             }else{
                 return Error.TITLE;
@@ -455,11 +473,22 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             ids.addAll(gameDate.getUsedCardGreen().get(about));
             ids.addAll(gameDate.getUsedCardRed().get(about));
 
-            List<Card.Symbol> symbolList = cardRepository.getSymbols(ids);
+            List<List<Card.Symbol>> symbolListList = cardRepository.getSymbols(ids);
 
+            List<Card.Symbol> symbolList = new ArrayList<>();
 
+            for(List<Card.Symbol> l: symbolListList){
+                for(Card.Symbol symbol: l){
+                    symbolList.add(symbol);
+                }
+            }
 
-            if((symbolList.stream().count() >= 15)&&gameDate.getTitles().get("SYMBOLS") == null){
+            if((symbolList.stream().count() >= 8)&&gameDate.getTitles().get("SYMBOLS") == null){
+                Error error = resources.put(CardSkills.Resource.GOLD, 8, false);
+
+                if(error != Error.NO_ERROR){
+                    return error;
+                }
                 gameDate.getTitles().put("SYMBOLS", about);
             }else {
                 return Error.TITLE;
@@ -617,7 +646,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
 
         if(freeAreas.get(areaIndex) == TRUE){
             listNew.set(areaIndex, ocean);
-            Error error1 = winningPoints.put(CardSkills.Resource.OCEAN,1, true, pz);
+            Error error1 = winningPoints.put(CardSkills.Resource.OCEAN, 1, true, pz);
             Error error2;
             error2 = resources.put(CardSkills.Resource.GOLD, 18, false);
 
@@ -627,7 +656,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
                 return;
             }
             if(error2 != Error.NO_ERROR){
-                sendErrorMessage(about, Error.PLANTS);
+                sendErrorMessage(about, Error.MONEY);
                 return;
             }
         }
@@ -1191,6 +1220,7 @@ public class GameQueue extends GameCoreQueue implements Timerable {
             myMessage.setMsg(List.of(gameDate.getPlayers().get(whoPlay), String.valueOf(roundTime)));
 
             rabbitTemplate.convertAndSend(playersExchange, "", myMessage);
+            sendStates();
 
             roundTime--;
 

@@ -41,8 +41,6 @@ public abstract class Creator {
 
         return URL;
     }
-
-    //
     protected abstract void save(NeedURL nurl);
     protected abstract List<String> getAllURL();
 

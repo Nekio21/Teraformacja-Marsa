@@ -37,7 +37,6 @@ public abstract class CoreQueue {
     private String queueSubName;
     private String queueSendName;
 
-    //TODO: Moze usuwac uniqname do ostatecznego Receive
 
     public CoreQueue(
             String uniqName,

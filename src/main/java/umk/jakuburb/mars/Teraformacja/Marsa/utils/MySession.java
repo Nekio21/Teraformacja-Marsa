@@ -24,7 +24,6 @@ public class MySession {
     }
 
     public void clear(){
-        //TODO: wyczycznie wszystkich pol
 
         playerQueue = null;
     }

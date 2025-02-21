@@ -106,7 +106,7 @@ public class GameController {
         mySession.getPlayerQueue().createBinding(new FanoutExchange(GameCreator.EXCHANGE_USERS_NAME_START + game.get().getUrl()));
         mySession.getPlayerQueue().addAddress(Adress.PLAYERS, GameCreator.EXCHANGE_USERS_NAME_START + game.get().getUrl());
         mySession.getPlayerQueue().addAddress(Adress.GAMECORE, GameCreator.EXCHANGE_GAME_NAME_START + game.get().getUrl());
-//        mySession.getPlayerQueue().sendIAmIn(new MyMessage());
+
         mySession.getPlayerQueue().gameIn();
 
         model.addAttribute("name", mySessionPlayer.getLogin());

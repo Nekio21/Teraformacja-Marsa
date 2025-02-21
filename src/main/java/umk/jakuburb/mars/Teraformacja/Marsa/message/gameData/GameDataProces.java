@@ -21,10 +21,24 @@ public class GameDataProces {
         Resources resources = gameData.getResources().get(user);
         WinningPoints winningPoints = gameData.getWinningPoints();
 
-        Error error = resources.put(CardSkills.Resource.GOLD, card.getPrice(), false);
+        if(card.getSymbolList().contains(Card.Symbol.METAL)){
+            Error error = resources.put(CardSkills.Resource.METAL, (int)Math.floor(card.getPrice()/(double)2), false);
 
-        if(error == Error.MONEY){
-            return error;
+            if(error == Error.METAL){
+                return error;
+            }
+        }else if(card.getSymbolList().contains(Card.Symbol.ATOM)){
+            Error error = resources.put(CardSkills.Resource.TITANIUM, (int)Math.floor(card.getPrice()/(double)3), false);
+
+            if(error == Error.TITANIUM){
+                return error;
+            }
+        }else {
+            Error error = resources.put(CardSkills.Resource.GOLD, card.getPrice(), false);
+
+            if (error == Error.MONEY) {
+                return error;
+            }
         }
 
         AtomicInteger pz = new AtomicInteger();
@@ -36,8 +50,12 @@ public class GameDataProces {
                 Error error1 = resources.put(cs.getResource(), cs.getAmount(), plus);
                 Error error2 = winningPoints.put(cs.getResource(), cs.getAmount(), plus, pz);
 
-                if (error1 != Error.NO_ERROR && error2 != Error.NO_ERROR) {
-                    return error;
+                if (error1 != Error.NO_ERROR) {
+                    return error1;
+                }
+
+                if(error2 != Error.NO_ERROR){
+                    return error2;
                 }
             }
         }
@@ -146,7 +164,7 @@ public class GameDataProces {
             list.add(GameDataCheck.USED_CARDS_RED);
         }
 
-        if(!Arrays.deepEquals(gd1.getCards().get(username).toArray(), gd2.getCards().get(username).toArray())){
+        if(!Arrays.deepEquals(gd1.getCards().getOrDefault(username, List.of()).toArray(), gd2.getCards().getOrDefault(username, List.of()).toArray())){
             list.add(GameDataCheck.CARD);
         }
 
@@ -176,6 +194,26 @@ public class GameDataProces {
 
         if(!(gd1.getRound() == gd2.getRound() && gd1.getWinningPoints() == gd2.getWinningPoints())){
             list.add(GameDataCheck.OTHERS);
+        }
+
+        if(!(Arrays.deepEquals(
+                gd1.getPrize().keySet().toArray(new String[0]),
+                gd2.getPrize().keySet().toArray(new String[0]))  &&
+                Arrays.deepEquals(
+                        gd1.getPrize().values().toArray(),
+                        gd2.getPrize().values().toArray())
+        )){
+            list.add(GameDataCheck.PRIZE);
+        }
+
+        if(!(Arrays.deepEquals(
+                gd1.getTitles().keySet().toArray(new String[0]),
+                gd2.getTitles().keySet().toArray(new String[0]))  &&
+                Arrays.deepEquals(
+                        gd1.getTitles().values().toArray(),
+                        gd2.getTitles().values().toArray())
+        )){
+            list.add(GameDataCheck.TITLES);
         }
 
         return list;

@@ -38,10 +38,10 @@ public class Loader implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        playerRepository.save(new Player("wru", passwordEncoder.encode("wru"), List.of(USER, LEMONIADA)));
+        playerRepository.save(new Player("wru", passwordEncoder.encode("wru"), List.of(USER)));
         playerRepository.save(new Player("Norka", passwordEncoder.encode("Norweg"), List.of(USER)));
-        playerRepository.save(new Player("PanJaroslaw", passwordEncoder.encode("PanJaroslaw"), List.of(ADMIN)));
-        playerRepository.save(new Player("truskawka", passwordEncoder.encode("majonez"), List.of(ADMIN)));
+        playerRepository.save(new Player("PanJaroslaw", passwordEncoder.encode("PanJaroslaw"), List.of(USER)));
+        playerRepository.save(new Player("truskawka", passwordEncoder.encode("majonez"), List.of(USER)));
 
         saveMainCard("mainCard1.png", List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL_PROD, 2),
@@ -68,23 +68,20 @@ public class Loader implements ApplicationRunner {
 
         saveCard("card1.png",31, Card.TypeCard.BLUE, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT_PROD, 1, CardSkills.Resource.OCEAN)
-        ));
+        ), List.of(Card.Symbol.BACTERIA));
         saveCard("card2.png", 38,Card.TypeCard.BLUE, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.ENERGY, 3, CardSkills.Resource.TREE)
-        ));
+        ), List.of(Card.Symbol.BEAR));
         saveCard("card3.png", 21,Card.TypeCard.BLUE, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL, 3, CardSkills.Resource.OXYGEN)
-        ));
+        ), List.of(Card.Symbol.EARTH, Card.Symbol.ENERGY));
         saveCard("card4.png", 15,Card.TypeCard.BLUE, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 3, CardSkills.Resource.TEMP)
-        ));
+        ), List.of(Card.Symbol.LEAF, Card.Symbol.LEAF));
         saveCard("card5.png", 22,Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT_PROD, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 2)
-        ));
-        saveCard("card6.png", 12,Card.TypeCard.RED, List.of(
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 1)
-        ));
+        ), List.of(Card.Symbol.ATOM, Card.Symbol.CITY));
         //saveCard("card7.png", 50,Card.TypeCard.GREEN, new ArrayList<>());
         //saveCard("card8.png", 31,Card.TypeCard.BLUE, new ArrayList<>());
         //saveCard("card10.png", 31,Card.TypeCard.BLUE, new ArrayList<>());
@@ -92,54 +89,38 @@ public class Loader implements ApplicationRunner {
         saveCard("card11.png", 21, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT_PROD, 2),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.ENERGY_PROD, 2)
-        ));
+        ), List.of());
         saveCard("card12.png", 23, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TITANIUM_PROD, 3)
-        ));
-        saveCard("card13.png", 27, Card.TypeCard.RED, List.of(
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 1),
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 1)
-        ));
-        saveCard("card14.png", 23, Card.TypeCard.RED, new ArrayList<>());
+        ), List.of());
         saveCard("card15.png", 1, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.ENERGY, 3)
-        ));
+        ), List.of());
         saveCard("card16.png", 1, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT, 3)
-        ));
+        ), List.of());
         saveCard("card17.png", 5, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 1)
-        ));
+        ), List.of());
         saveCard("card18.png", 15, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL_PROD, 2),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.ENERGY_PROD, 2)
-        ));
+        ), List.of());
         saveCard("card19.png", 17, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 2)
-        ));
-        saveCard("card20.png", 3, Card.TypeCard.RED, List.of(
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.CARD, 2)
-        ));
+        ), List.of());
         saveCard("card21.png", 12, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 1)
-        ));
+        ), List.of());
         saveCard("card22.png", 11, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.GOLD_PROD, 2)
-        ));
-        saveCard("card23.png", 4, Card.TypeCard.RED, List.of(
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.CARD, 1),
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL, 1),
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT, 1)
-        ));
-        saveCard("card24.png", 8, Card.TypeCard.RED, List.of(
-                new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 1)
-        ));
+        ), List.of());
         saveCard("card25.png", 6, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS_PROD, 3)
-        ));
+        ), List.of());
         saveCard("card26.png", 13, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 1)
-        ));
+        ), List.of());
 
 
 
@@ -149,67 +130,97 @@ public class Loader implements ApplicationRunner {
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.ENERGY, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 1)
-        ));
+        ), List.of());
 
         saveCard("card28.png", 14, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 1)
-        ));
+        ), List.of());
         saveCard("card29.png", 13, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TITANIUM, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL, 1),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT, 1)
-        ));
+        ), List.of());
         saveCard("card30.png", 21, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.METAL, 3)
-        ));
+        ), List.of());
         saveCard("card31.png", 24, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.HEAT, 3)
-        ));
+        ), List.of());
         saveCard("card32.png", 27, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS, 6)
-        ));
+        ), List.of());
         saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
-        ));
+        ), List.of());
 
         saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
-        ));
+        ), List.of());
 
         saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
-        ));
+        ), List.of());
 
         saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
                 new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
-        ));
+        ), List.of());
 
         for(int i=0;i<10;i++) {
             saveCard("card33.png", 10, Card.TypeCard.RED, List.of(
                     new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OCEAN, 10),
                     new CardSkills(CardSkills.Move.GET, CardSkills.Resource.OXYGEN, 10),
                     new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TEMP, 10)
-            ));
+            ), List.of());
         }
+
+        for(int i=0;i<10;i++) {
+            saveCard("card34.png", 1, Card.TypeCard.GREEN, List.of(
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PZ, 3)
+            ), List.of(Card.Symbol.CITY, Card.Symbol.CITY, Card.Symbol.ACTION, Card.Symbol.LEAF));
+        }
+
+        for(int i=0;i<10;i++) {
+            saveCard("card35.png", 5, Card.TypeCard.GREEN, List.of(
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PZ, 1),
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PLANTS_PROD, 3)
+            ), List.of(Card.Symbol.CITY, Card.Symbol.ATOM, Card.Symbol.ATOM));
+        }
+
+        for(int i=0;i<10;i++) {
+            saveCard("card36.png", 11, Card.TypeCard.GREEN, List.of(
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.PZ, 2),
+                    new CardSkills(CardSkills.Move.GET, CardSkills.Resource.TITANIUM_PROD, 3)
+            ), List.of(Card.Symbol.METAL, Card.Symbol.METAL));
+        }
+        
     }
 
     private void saveMainCard(String name, List<CardSkills> list) throws IOException {
-        saveCard("main/" + name, 0, Card.TypeCard.MAIN, list);
+        saveCard("main/" + name, 0, Card.TypeCard.MAIN, list, List.of());
     }
 
-    private void saveCard(String name, int price, Card.TypeCard typeCard, List<CardSkills> list) throws IOException{
+    private void saveCard(String name, int price, Card.TypeCard typeCard, List<CardSkills> list, List<Card.Symbol> symbolList) throws IOException{
         File file = new ClassPathResource("static/assets/cards/" + name).getFile();
         Card card = new Card(typeCard,price, Files.readAllBytes(file.toPath()));
+
+        List<Card.Symbol> listSym = new ArrayList<>();
+
+        for(Card.Symbol symbol: symbolList){
+            listSym.add(symbol);
+        }
+
+        card.setSymbolList(listSym);
+
         cardRepository.save(card);
 
         for(CardSkills cardSkills: list){

@@ -17,12 +17,6 @@ import static umk.jakuburb.mars.Teraformacja.Marsa.message.CardToSend.makeListCa
 
 public class PlayerQueue extends CoreQueue{
 
-    //TODO: to chyba srednio bezpieczne by podawac nazwe kolejki co nie ???
-    //TODO: spawdzac hedery !!!!!
-    //https://stackoverflow.com/questions/31564432/websocket-security
-
-    //TODO: java.net.SocketException: An established connection was aborted by the software in your host machine
-
     private CardRepository cardRepository;
 
     public PlayerQueue(String uniqName,CardRepository cardRepository, RabbitAdmin rabbitAdmin, RabbitTemplate rabbitTemplate){
@@ -112,6 +106,7 @@ public class PlayerQueue extends CoreQueue{
     }
 
     public void gameIn(){
+        gameData = new GameData();
         userInGame();
         recoverSend();
     }
@@ -224,6 +219,37 @@ public class PlayerQueue extends CoreQueue{
                     ).stream().map(String::valueOf).toList());
                     this.gameData.setRound(gameData.getRound());
                     this.gameData.setWinningPoints(gameData.getWinningPoints());
+                }
+                case PRIZE -> {
+                    msgToSend.setOwners(gameData.getPlayers());
+
+                    List<String> list = new ArrayList<>();
+
+                    for(String s: gameData.getPrize().keySet()){
+                        if(gameData.getPrize().get(s) == true){
+                            list.add(s);
+                        }
+                    }
+
+                    msgToSend.setMsg(list);
+
+
+                    this.gameData.setPrize(gameData.getPrize());
+                }
+                case TITLES -> {
+                    msgToSend.setOwners(gameData.getPlayers());
+
+                    List<String> list = new ArrayList<>();
+
+                    for(String s: gameData.getTitles().keySet()){
+                        if(gameData.getTitles().get(s) != null){
+                            list.add(s);
+                            list.add(gameData.getTitles().get(s));
+                        }
+                    }
+                    msgToSend.setMsg(list);
+
+                    this.gameData.setTitles(gameData.getTitles());
                 }
             }
 

@@ -28,8 +28,6 @@ import java.util.function.Predicate;
 @RequestMapping("/mars/lobby")
 public class WebLobby {
 
-    //TODO: potem stworz sersy i tam ma byc cala logika
-
     @Autowired
     private GameLobbyCreator gameLobbyCreator;
 
@@ -145,7 +143,6 @@ public class WebLobby {
         Optional<Lobby> lobby = lobbyRepository.findByCode(code);
 
         if(lobby.isEmpty()){
-            //TODO: dodaj ? ktory bedzie mowil ze kod jest zly i moze 3 zle kody i zawiesic na jakis czas usera nie wiem :D
             return "redirect:/mars/home";
         }
 

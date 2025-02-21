@@ -22,8 +22,6 @@ public class Card {
     private Long id;
 
     private TypeCard typeCard;
-    //@Column(name = "image", columnDefinition="org.hibernate.type.BinaryType")
-
     private int price;
     private byte[] image;
 

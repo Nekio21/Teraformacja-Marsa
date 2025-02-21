@@ -17,7 +17,7 @@ public abstract class GameCoreQueue {
     private RabbitAdmin rabbitAdmin;
     private DirectExchange directExchange;
     protected Queue helpPlayers;
-    private String uniqName;
+    protected String uniqName;
 
     private HashMap<MessageType, Consumer<MyMessage>> receiveMap;
     public static final String CLOCK_EXCHANGE_NAME = "games.clock";
@@ -61,11 +61,8 @@ public abstract class GameCoreQueue {
         helpPlayers = new Queue(helpQueueName);
 
         directExchange = new DirectExchange(uniqName);
-        //FanoutExchange fanoutExchange = new FanoutExchange(CLOCK_EXCHANGE_NAME);
-
         rabbitAdmin.declareQueue(helpPlayers);
         rabbitAdmin.declareExchange(directExchange);
-        //rabbitAdmin.declareExchange(fanoutExchange);
 
         Binding binding2 = BindingBuilder.bind(helpPlayers).to(directExchange).with("help");
 

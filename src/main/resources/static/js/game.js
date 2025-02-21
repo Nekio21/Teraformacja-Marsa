@@ -122,7 +122,7 @@ async function startWS(){
 
                 }
 				else if(msg.recoverType == "PLAYERS"){
-                    
+
                     let x = 0;
 
                     for(let i=0;i<msg.msg.length;i++){
@@ -142,9 +142,26 @@ async function startWS(){
                     updateMainCard();
                 }
 				else if(msg.recoverType == "USED_CARDS_BLUE"){
+                    for(let i=0;i<msg.owners.length;i++){
+                        cardUsedBlue.set(msg.owners[i], msg.cardsList[i]);
+                    }
+
+                    updateCardConstainer();
                 }
-				else if(msg.recoverType == "USED_CARDS_RED"){}
-				else if(msg.recoverType == "USED_CARDS_GREEN"){}
+				else if(msg.recoverType == "USED_CARDS_RED"){
+                    for(let i=0;i<msg.owners.length;i++){
+                        cardUsedRed.set(msg.owners[i], msg.cardsList[i]);
+                    }
+
+				    updateCardConstainer();
+				}
+				else if(msg.recoverType == "USED_CARDS_GREEN"){
+				    for(let i=0;i<msg.owners.length;i++){
+                        cardUsedGreen.set(msg.owners[i], msg.cardsList[i]);
+                    }
+
+				    updateCardConstainer();
+				}
 				else if(msg.recoverType == "CARD"){
                     for(let i=0;i<msg.owners.length;i++){
                         if(msg.owners[i] == playerName){
@@ -172,6 +189,17 @@ async function startWS(){
                 }
 				else if(msg.recoverType == "LEVEL"){
                     console.log(msg)
+
+                    let x = 0;
+
+                    for(let i=0;i<msg.owners.length;i++){
+                                       if(msg.owners[i] != playerName){
+                                           namesOther[x] = msg.owners[i];
+                                           x++;
+                                       }
+                                    }
+
+                    updatePlayers()
                     makeLevels(msg.dataLong, msg.owners)
                     useLevels(msg.owners)
                 }
@@ -189,6 +217,12 @@ async function startWS(){
                     oceanWK = msg.msg[6];
 
                     updateOthers()
+                }
+                else if(msg.recoverType == "PRIZE"){
+                    prize2(msg);
+                }
+                else if(msg.recoverType == "TITLES"){
+                    title2(msg);
                 }
             }
             else if(msg.messageType == "GAME_STATE"){
@@ -314,7 +348,16 @@ async function startWS(){
                     userStates.set(msg.owners[i], msg.msg[i]);
                 }
 
-                
+                let x = 0;
+
+                              for(let i=0;i<msg.owners.length;i++){
+                                                   if(msg.owners[i] != playerName){
+                                                       namesOther[x] = msg.owners[i];
+                                                       x++;
+                                                   }
+                                                }
+
+                updatePlayers()
                 useLevels(msg.owners)
 
                 if(userStates.get(playerName) == "CHOSE_CARD"){
@@ -323,7 +366,9 @@ async function startWS(){
 				}
                 
                 if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
-                    document.getElementById("endRound").classList.add("endRoundActive");
+                    if(!document.getElementById("endRound").classList.contains("endRoundActive")){
+                        document.getElementById("endRound").classList.add("endRoundActive");
+                    }
                 }else{
                     document.getElementById("endRound").classList.remove("endRoundActive");  
                 }
@@ -368,6 +413,17 @@ async function startWS(){
             }
             else if(msg.messageType == "LEVELS"){
                 console.log(msg)
+
+                let x = 0;
+
+                for(let i=0;i<msg.owners.length;i++){
+                                   if(msg.owners[i] != playerName){
+                                       namesOther[x] = msg.owners[i];
+                                       x++;
+                                   }
+                                }
+
+                updatePlayers()
                 makeLevels(msg.dataLong, msg.owners)
                 useLevels(msg.owners)
             }
@@ -394,7 +450,7 @@ async function startWS(){
                 title(msg);
             }
             else if(msg.messageType == "PRIZE"){
-                prize(msg)
+                prize(msg.owners, msg.about, msg.msg[0])
             }
             else if(msg.messageType == "END_GAME_SCORE"){
                 endGameScore(msg);
@@ -405,6 +461,12 @@ async function startWS(){
             else if(msg.messageType == "ERROR"){
                 if(msg.error == "MONEY"){
                     document.getElementById("errorDiv").innerHTML = "za mało pieniedzy";
+                }
+                else if(msg.error == "METAL"){
+                    document.getElementById("errorDiv").innerHTML = "za mało metalu";
+                }
+                else if(msg.error == "TITANIUM"){
+                    document.getElementById("errorDiv").innerHTML = "za mało tytanu";
                 }
                 else if(msg.error == "NO_YOUR_MOVE"){
                      document.getElementById("errorDiv").innerHTML = "nie twój ruch";
@@ -428,7 +490,7 @@ async function startWS(){
                     document.getElementById("errorDiv").innerHTML = "problem z miastem";
                 }
                 else{
-                    document.getElementById("errorDiv").innerHTML = msg.error;
+                    document.getElementById("errorDiv").innerHTML = "wystąpił bład: " + msg.error;
                 }
                 setTimeout( function() { document.getElementById("errorDiv").innerHTML = "" }, 1000);
             }
@@ -568,6 +630,11 @@ function updatePlayers(){
 
 function endGameScore(msg){
     let endGameDiv = document.getElementById("endGame");
+    let button = endGameDiv.getElementsByTagName("a")[0];
+    let button2 = document.createElement("a");
+    button2.innerHTML = button.innerHTML;
+    button2.href = button.href;
+
     endGameDiv.innerHTML = "";
 
     let table = document.createElement("table");
@@ -592,10 +659,20 @@ function endGameScore(msg){
         td3.innerHTML = msg.owners[1];
         td4.innerHTML = msg.owners[2];
 
+        td2.style.fontWeight = "900"
+        td3.style.fontWeight = "900"
+        td4.style.fontWeight = "900"
+
+        td2.style.textAlign = "center";
+        td3.style.textAlign = "center";
+        td4.style.textAlign = "center";
+
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
         tr.appendChild(td4);
+
+
         table.appendChild(tr);
 
     for(let i=0;i<msg.dataListLong[0].length; i++){
@@ -610,6 +687,10 @@ function endGameScore(msg){
         td3.innerHTML = msg.dataListLong[1][i];
         td4.innerHTML = msg.dataListLong[2][i];
 
+        td2.style.textAlign = "center";
+        td3.style.textAlign = "center";
+        td4.style.textAlign = "center";
+
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
@@ -618,6 +699,7 @@ function endGameScore(msg){
     }
 
     endGameDiv.appendChild(table);
+    endGameDiv.appendChild(button2);
 }
 
 function planetTree(tab){
@@ -735,8 +817,6 @@ function makePlanet(){
             else if(planet[w]=="CITY_P3"){
                 img.src = "../../assets/rectCityP3.svg";  
             }
-
-            span.innerHTML = w;
             
             divs[y].appendChild(img);
             divs[y].appendChild(span);
@@ -867,7 +947,7 @@ document.getElementById("ps2").addEventListener("click", function(){
 
 document.getElementById("ps3").addEventListener("click", function(){
     if(userStates.get(playerName) == "FIRST_MOVE" || userStates.get(playerName) == "SECOND_MOVE"){
-        sendToServer("PS",["TEMP"]);
+        sendToServer("PS",["HEAT"]);
     }
 });
 
@@ -937,17 +1017,102 @@ document.getElementById("endRound").addEventListener("click", function(){
     }
 });
 
+function title2(msg){
 
-function prize(msg){
+let colors = [
+        "#15616D",
+        "#6D4515",
+        "#6D1515"
+    ];
+
+    for(let i=0;i<msg.msg.length;i=i+2){
+        var titleDiv;
+        var img = document.createElement("img");
+            var span = document.createElement("span");
+             let index = 0;
+
+        for(let j=0;j<msg.owners.length;j++){
+                if(msg.owners[j] == msg.msg[i+1]){
+                    index = j;
+                }
+            }
+
+        img.src = "../../assets/rectP" + (index+1) + ".svg";
+            img.style.width = "60px";
+            img.style.width = "69px";
+
+            span.classList.add("material-symbols-outlined");
+            span.style.color = colors[index];
+            span.style.fontSize = "30px"
+
+            if(msg.msg[i] == "PZ"){
+                    titleDiv = document.getElementById("title1");
+                    span.innerHTML = "token";
+                }
+                else if(msg.msg[i] == "CITY"){
+                    titleDiv = document.getElementById("title2");
+                    span.innerHTML = "fort";
+                }
+                else if(msg.msg[i] == "FOREST"){
+                    titleDiv = document.getElementById("title3");
+                    span.innerHTML = "forest";
+                }
+                else if(msg.msg[i] == "CARD"){
+                    titleDiv = document.getElementById("title4");
+                    span.innerHTML = "style";
+                }
+                else if(msg.msg[i] == "SYMBOLS"){
+                    titleDiv = document.getElementById("title5");
+                    span.innerHTML = "emergency";
+                }
+
+                titleDiv.parentElement.style.cursor = "inherit";
+                    titleDiv.innerHTML = "";
+                    titleDiv.appendChild(img);
+                    titleDiv.appendChild(span);
+    }
+}
+
+function prize2(msg){
+    for(let i=0;i<msg.msg.length;i++){
+
+        if(msg.msg[i] == "PZ"){
+                let prizeDiv = document.getElementById("prize1");
+                prizeDiv.style.opacity = 0.7;
+        }
+        else if(msg.msg[i] == "GOLD"){
+                let prizeDiv = document.getElementById("prize2");
+                                prizeDiv.style.opacity = 0.7;
+            }
+            else if(msg.msg[i] == "LEAF"){
+                let prizeDiv = document.getElementById("prize3");
+                                prizeDiv.style.opacity = 0.7;
+            }
+            else if(msg.msg[i] == "ENERGY"){
+                let prizeDiv = document.getElementById("prize4");
+                                prizeDiv.style.opacity = 0.7;
+            }
+            else if(msg.msg[i] == "HEAT"){
+                let prizeDiv = document.getElementById("prize5");
+                                prizeDiv.style.opacity = 0.7;
+            }else{
+                return;
+            }
+    }
+
+
+}
+
+function prize(owners, about, elementName){
     let index = 0;
     let colors = [
         "#15616D",
-        "#6D1515",
-        "#6D4515"
+        "#6D4515",
+        "#6D1515"
     ];
 
-    for(let i=0;i<msg.owners.length;i++){
-        if(msg.owners[i] == msg.about){
+    for(let i=0;i<owners.length;i++){
+        if(owners[i] == about){
             index = i;
         }
     }
@@ -956,7 +1121,7 @@ function prize(msg){
     var img = document.createElement("img");
     var span = document.createElement("span");
 
-    img.src = "../../assets/rectP" + index + ".svg";
+    img.src = "../../assets/rectP" + (index+1) + ".svg";
     img.style.width = "60px";
     img.style.width = "69px";
 
@@ -964,25 +1129,27 @@ function prize(msg){
     span.style.color = colors[index];
     span.style.fontSize = "30px"
 
-    if(msg.msg[0] == "PZ"){
+    if(elementName == "PZ"){
         prizeDiv = document.getElementById("prize1");
         span.innerHTML = "token";
     }
-    else if(msg.msg[0] == "GOLD"){
+    else if(elementName == "GOLD"){
         prizeDiv = document.getElementById("prize2");
         span.innerHTML = "paid";
     }
-    else if(msg.msg[0] == "LEAF"){
+    else if(elementName == "LEAF"){
         prizeDiv = document.getElementById("prize3");
         span.innerHTML = "eco";
     }
-    else if(msg.msg[0] == "ENERGY"){
+    else if(elementName == "ENERGY"){
         prizeDiv = document.getElementById("prize4");
         span.innerHTML = "bolt";
     }
-    else if(msg.msg[0] == "HEAT"){
+    else if(elementName == "HEAT"){
         prizeDiv = document.getElementById("prize5");
         span.innerHTML = "local_fire_department";
+    }else{
+        return;
     }
 
     prizeDiv.parentElement.style.cursor = "inherit";
@@ -997,8 +1164,8 @@ function title(msg){
     let index = 0;
     let colors = [
         "#15616D",
-        "#6D1515",
-        "#6D4515"
+        "#6D4515",
+        "#6D1515"
     ];
 
     for(let i=0;i<msg.owners.length;i++){
@@ -1011,7 +1178,7 @@ function title(msg){
     var img = document.createElement("img");
     var span = document.createElement("span");
 
-    img.src = "../../assets/rectP" + index + ".svg";
+    img.src = "../../assets/rectP" + (index+1) + ".svg";
     img.style.width = "60px";
     img.style.width = "69px";
 

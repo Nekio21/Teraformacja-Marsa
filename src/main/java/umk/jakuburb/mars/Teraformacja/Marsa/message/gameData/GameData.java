@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.*;
 
 public class GameData implements Serializable {
-    //Wszystko to co widzi user jak gra
 
     @JsonProperty("chatMessage")
     private List<ChatRecord> chat;

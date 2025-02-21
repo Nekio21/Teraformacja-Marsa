@@ -323,21 +323,32 @@ body{
     background-color: #100803;
 }
 
-.endGame{
+#endGame{
     display: flex;
     justify-content: center;
     align-items: center;
-
-    position: absolute;
-    right: 90px;
-    bottom: 30px;
-
-    text-align: center;
-
-    width: 116px;
     height: calc(100% - 80px);
+    padding-top: 40px;
+    flex-direction: column;
+    gap:40px;
+    font-size: 21px;
+}
 
-    cursor:pointer;
+#endGame > a{
+    color: #fbfbfb;
+    opacity:0.7;
+}
+
+#endGame > a:hover{
+    opacity:1;
+}
+
+td{
+    padding:17px;
+}
+
+a{
+    text-decoration: none;
 }
 
 .errorMessage{
@@ -362,7 +373,7 @@ body{
 	cursor:pointer;
 }
 
-.endGame > header{
+#endGame > header{
     position: absolute;
 }
 

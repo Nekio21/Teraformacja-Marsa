@@ -18,9 +18,6 @@ public class SecurityConfig {
 
     @Autowired
     private PlayerRepository playerRepository;
-
-
-    //TODO: potem zrob tak by ten csrf byl dostepny
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
