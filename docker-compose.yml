@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  myapp:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - my_network
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: mars
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15674:15674"  # Dodany brakujący port z Twojej komendy
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_web_stomp &&
+             rabbitmq-server"
+    networks:
+      - my_network
+
+volumes:
+  postgres-data: {}
+  rabbitmq-data: {}
+
+networks:
+  my_network:
+    driver: bridge

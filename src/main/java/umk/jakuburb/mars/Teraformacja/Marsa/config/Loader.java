@@ -15,6 +15,7 @@ import umk.jakuburb.mars.Teraformacja.Marsa.database.repository.PlayerRepository
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,8 +211,12 @@ public class Loader implements ApplicationRunner {
     }
 
     private void saveCard(String name, int price, Card.TypeCard typeCard, List<CardSkills> list, List<Card.Symbol> symbolList) throws IOException{
-        File file = new ClassPathResource("static/assets/cards/" + name).getFile();
-        Card card = new Card(typeCard,price, Files.readAllBytes(file.toPath()));
+        //File file = new ClassPathResource("static/assets/cards/" + name).getFile();
+        //Card card = new Card(typeCard,price, Files.readAllBytes(file.toPath()));
+
+        byte[] fileBytes = new ClassPathResource("static/assets/cards/" + name).getInputStream().readAllBytes();
+        Card card = new Card(typeCard, price, fileBytes);
+
 
         List<Card.Symbol> listSym = new ArrayList<>();
 

@@ -87,7 +87,6 @@ public class PlayerQueue extends CoreQueue{
         message.setMsg(List.of(send.getMsg().get(0), uniqName));
 
         rabbitTemplate.convertAndSend(addressMap.get(Adress.GAMECORE),"help", message);
-        //rabbitTemplate.convertAndSend(addressMap.get(Adress.PLAYERS), "", message);
     }
 
     private MyMessage messageReceive(MyMessage send){

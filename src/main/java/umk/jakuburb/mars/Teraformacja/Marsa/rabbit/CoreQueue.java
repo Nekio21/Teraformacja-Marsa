@@ -140,7 +140,7 @@ public abstract class CoreQueue {
 
                 func.accept(myMessageLite);
             }catch(Exception e){
-                System.out.println("Bład[CoreQueue(addQueueListener)]: " + e);
+                System.out.println("error[CoreQueue(addQueueListener)]: " + e);
             }
         });
 
