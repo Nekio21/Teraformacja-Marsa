@@ -30,7 +30,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-      - "15674:15674"  # Dodany brakujący port z Twojej komendy
+      - "15674:15674"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     command: >
